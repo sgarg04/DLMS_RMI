@@ -227,9 +227,29 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 
 	@Override
 	public HashMap<String, String> findItem(String userId, String itemName) {
-		fetchBook = getAllLibraries();
-		System.out.println(fetchBook + "all lib books");
-		return fetchBook;
+		HashMap<String, String> displayBooks = new HashMap<String, String>();
+		for (Map.Entry<String, String> entry : Concordia.conBooks.entrySet()) {
+	        String key = entry.getKey();
+	        String value = entry.getValue();
+	        if(value.split(",")[0].trim().equalsIgnoreCase(itemName)) {
+	        	displayBooks.put(key, value);
+	        }
+	    }
+		for (Map.Entry<String, String> entry : Montreal.monBooks.entrySet()) {
+	        String key = entry.getKey();
+	        String value = entry.getValue();
+	        if(value.split(",")[0].trim().equalsIgnoreCase(itemName)) {
+	        	displayBooks.put(key, value);
+	        }
+	    }
+		for (Map.Entry<String, String> entry : McGill.mcgBooks.entrySet()) {
+	        String key = entry.getKey();
+	        String value = entry.getValue();
+	        if(value.split(",")[0].trim().equalsIgnoreCase(itemName)) {
+	        	displayBooks.put(key, value);
+	        }
+	    }
+		return displayBooks;
 	}
 
 	@Override
