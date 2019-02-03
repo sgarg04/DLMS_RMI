@@ -11,26 +11,29 @@ import java.util.HashMap;
 
 public interface ActionService extends Remote {
 
-	//Manager
-	
+	// Manager
+
 	// Adds item to the Library
-	public String addItem(String managerID, String itemID, String itemName, int quantity)throws RemoteException;
+	public String addItem(String managerID, String itemID, String itemName, int quantity) throws RemoteException;
 
 	// Removes item from the Library
-	public String removeItem(String managerID, String itemID, int quantity)throws RemoteException;
+	public String removeItem(String managerID, String itemID, int quantity) throws RemoteException;
 
 	// Lists Item of the Library
-	public HashMap<String, String> listItemAvailability(String managerID)throws RemoteException;
+	public HashMap<String, String> listItemAvailability(String managerID) throws RemoteException;
 
-	//User	
-	
+	// User
+
 	// Borrows an Item to the User
-	public String borrowItem(String userID, String itemID, int numberOfDays)throws RemoteException;
+	public String borrowItem(String userID, String itemID, int numberOfDays) throws RemoteException;
+
+	// Adds user in the wait list of the item
+	public String waitList(String userID, String itemID) throws RemoteException;
 
 	// Finds an Item from the Library
-	public HashMap<String, String> findItem(String userId, String itemName)throws RemoteException;
+	public HashMap<String, String> findItem(String userId, String itemName) throws RemoteException;
 
 	// Returns Item to the Library
-	public String returnItem(String userID, String itemID)throws RemoteException;
+	public String returnItem(String userID, String itemID) throws RemoteException;
 
 }

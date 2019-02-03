@@ -200,59 +200,27 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 	public String borrowItem(String userID, String itemID, int numberOfDays) {
 
 		itemID = itemID.toUpperCase();
-		switch (userID.substring(0, 3)) {
-		case "CON":
-			fetchBook = Concordia.conBooks;
-			if (Concordia.conBooks.containsKey(itemID)) {
-				int quantity = Integer.parseInt(Concordia.conBooks.get(itemID).split(",")[1]);
-				System.out.println("Quantity is" + quantity);
-				if (quantity > 0) {
-					Concordia.setUserDetails(userID, itemID, numberOfDays);
-					quantity--;
-					System.out.println("Quantity after reduction" + quantity);
-					System.out.println(fetchBook.get(itemID).split(",")[0]);
-					System.out.println("before" + Concordia.conBooks.get(itemID));
-					Concordia.conBooks.put(itemID, fetchBook.get(itemID).split(",")[0] + "," + quantity);
-					operation = "Item issued";
-					System.out.println("Concordia User borrow list" + Concordia.conUserList);
-					System.out.println("after books" + Concordia.conBooks);
-				} else {
-					operation = "Item not available";
-				}
-			}
-			break;
-		case "MON":
-			fetchBook = Montreal.monBooks;
-			if (Montreal.monBooks.containsKey(itemID)) {
-				itemID = itemID.toUpperCase();
-				int quantity = Integer.parseInt(Montreal.monBooks.get(itemID).split(",")[1]);
-				if (quantity > 0) {
-					Montreal.setUserDetails(userID, itemID, numberOfDays);
-					quantity -= 1;
-					Montreal.monBooks.put(itemID, fetchBook.get(itemID).split(",")[0] + "," + quantity);
-					operation = "Item issued";
-					System.out.println("Montreal User borrow list" + Montreal.monUserList);
-				} else {
-					operation = "Item not available";
-				}
-			}
-			break;
-		case "MCG":
-			if (McGill.mcgBooks.containsKey(itemID)) {
-				int quantity = Integer.parseInt(McGill.mcgBooks.get(itemID).split(",")[1]);
-				if (quantity > 0) {
-					McGill.setUserDetails(userID, itemID, numberOfDays);
-					quantity -= 1;
-					McGill.mcgBooks.put(itemID, fetchBook.get(itemID).split(",")[0] + "," + quantity);
-					operation = "Item issued";
-					System.out.println("McGill user borrow list" + McGill.mcgUserList);
-					System.out.println("books" + McGill.mcgBooks);
-				} else {
-					operation = "Item not available";
-				}
-			}
-			break;
-
+		if (userID.substring(0, 3).equals("CON")) {
+			operation = Concordia.borrowBookToUser(userID, itemID, numberOfDays);
+		} else if (userID.substring(0, 3).equals("MON")) {
+			operation = Montreal.borrowBookToUser(userID, itemID, numberOfDays);
+		}
+		if (userID.substring(0, 3).equals("MCG")) {
+			operation = McGill.borrowBookToUser(userID, itemID, numberOfDays);
+		}
+		return operation;
+	}
+	
+	@Override
+	public String waitList(String userID, String itemID) throws RemoteException {
+		itemID = itemID.toUpperCase();
+		if (userID.substring(0, 3).equals("CON")) {
+			operation = Concordia.addUserToWaitlist(userID, itemID);
+		} else if (userID.substring(0, 3).equals("MON")) {
+			operation = Montreal.addUserToWaitlist(userID, itemID);
+		}
+		if (userID.substring(0, 3).equals("MCG")) {
+			operation = McGill.addUserToWaitlist(userID, itemID);
 		}
 		return operation;
 	}
@@ -269,10 +237,9 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 		itemID = itemID.toUpperCase();
 		switch (userID.substring(0, 3)) {
 		case "CON":
-			if (Concordia.conUserList.contains(userID)
-					&& Concordia.conUserList.containsKey(itemID)) {
-				Concordia.borrowConBook.remove(itemID);
-				System.out.println(Concordia.borrowConBook+"33");
+			if (Concordia.conUserList.contains(userID) && Concordia.conUserList.contains(itemID)) {
+				Concordia.conBooks.remove(itemID);
+				System.out.println(Concordia.conUserList + "33");
 			}
 			break;
 		case "MON":
@@ -283,5 +250,7 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 
 		return null;
 	}
+
+	
 
 }
