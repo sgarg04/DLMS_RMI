@@ -167,7 +167,7 @@ public class Client {
 										HashMap<String, String> bookList = new HashMap<String, String>();
 										bookList=serverRef.findItem(userID, itemName);
 										if(!bookList.isEmpty()) {
-											System.out.println("Books Available in Library with"+itemName+ ":\n");
+											System.out.println("Books Available in Library with '"+itemName+ "':\n");
 											bookList.forEach((k, v) -> System.out.print((k +" " + v.split(",")[1]+","+" ")));
 											System.out.println();
 										}
@@ -184,7 +184,7 @@ public class Client {
 										serverRef.returnItem(userID, itemID);
 										break;
 									}
-									System.out.println("\n Do you wish to continue? Yes or No");
+									System.out.println("\nDo you wish to continue? Yes or No");
 									userWish = reader.readLine();
 								}
 								System.out.println("Thank you!");

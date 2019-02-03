@@ -31,6 +31,7 @@ public class Concordia {
 	static String sendRequestReceived;
 	static String dataReceived;
 	static String message;
+	static boolean isUserAllowed;
 
 	public Concordia() throws RemoteException {
 		super();
@@ -150,6 +151,7 @@ public class Concordia {
 		temp.put(itemID, numberOfDays);
 		User userObj = new User(userID, temp);
 		conUserList.add(userObj);
+		System.out.println(userObj.getUserID() + " user ID\n");
 
 	}
 
@@ -189,30 +191,39 @@ public class Concordia {
 			break;
 
 		case "MON":
-			sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays;
-			sendMessage(2222);
-			if (dataReceived.equalsIgnoreCase("pass")) {
-				setUserDetails(userID, itemID, numberOfDays);
-				message = "pass";
-				System.out.println(conUserList + " after Montreal lib operation");
-			} else if (dataReceived.equalsIgnoreCase("unavailable")) {
-				message = "unavailable";
-			} else if (dataReceived.equalsIgnoreCase("failed")) {
-				message = "invalid";
+			
+			if (ActionServiceImpl.isUserAllowedInterLibraryBorrow("MON", conUserList)) {
+				System.out.println("***********************************************");
+				sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays;
+				sendMessage(2222);
+				if (dataReceived.equalsIgnoreCase("pass")) {
+					setUserDetails(userID, itemID, numberOfDays);
+					message = "pass";
+					System.out.println(conUserList + " after Montreal lib operation");
+				} else if (dataReceived.equalsIgnoreCase("unavailable")) {
+					message = "unavailable";
+				} else if (dataReceived.equalsIgnoreCase("failed")) {
+					message = "invalid";
+				}
+			} else {
+				message = "User has already borrowed Montreal Library book";
 			}
-
 			break;
 		case "MCG":
-			sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays;
-			sendMessage(3333);
-			if (dataReceived.equalsIgnoreCase("pass")) {
-				setUserDetails(userID, itemID, numberOfDays);
-				System.out.println(conUserList + " after McGill lib operation");
-				message = "pass";
-			} else if (dataReceived.equalsIgnoreCase("unavailable")) {
-				message = "unavailable";
-			} else if (dataReceived.equalsIgnoreCase("failed")) {
-				message = "invalid";
+			if (ActionServiceImpl.isUserAllowedInterLibraryBorrow("MCG", conUserList)) {
+				sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays;
+				sendMessage(3333);
+				if (dataReceived.equalsIgnoreCase("pass")) {
+					setUserDetails(userID, itemID, numberOfDays);
+					System.out.println(conUserList + " after McGill lib operation");
+					message = "pass";
+				} else if (dataReceived.equalsIgnoreCase("unavailable")) {
+					message = "unavailable";
+				} else if (dataReceived.equalsIgnoreCase("failed")) {
+					message = "invalid";
+				}
+			} else {
+				message = "User has already borrowed McGill Library book";
 			}
 			break;
 		}

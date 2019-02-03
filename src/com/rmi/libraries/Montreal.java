@@ -39,15 +39,15 @@ public class Montreal {
 		thread.start();
 
 		ActionServiceImpl monStub = new ActionServiceImpl();
-		System.out.println("Montreal server started"+"\n");
+		System.out.println("Montreal server started" + "\n");
 
 		try {
 			// special exception handler for registry creation
 			LocateRegistry.createRegistry(5555);
-			System.out.println("Montreal registry created."+"\n");
+			System.out.println("Montreal registry created." + "\n");
 		} catch (RemoteException e) {
 			// do nothing, error means registry already exists
-			System.out.println("Montreal registry already exists."+"\n");
+			System.out.println("Montreal registry already exists." + "\n");
 		}
 
 		// Instantiate Montreal Server and bind this object instance to the name
@@ -86,7 +86,7 @@ public class Montreal {
 		case "MON":
 			if (monBooks.containsKey(itemID)) {
 				int quantity = Integer.parseInt(monBooks.get(itemID).split(",")[1]);
-				System.out.println("Quantity is" + quantity+"\n");
+				System.out.println("Quantity is" + quantity + "\n");
 				if (quantity > 0) {
 					if (userID.substring(0, 3).equalsIgnoreCase("MON")) {
 						setUserDetails(userID, itemID, numberOfDays);
@@ -94,12 +94,12 @@ public class Montreal {
 						message = "";
 					}
 					quantity--;
-					System.out.println("Quantity after reduction" + quantity+"\n");
-					System.out.println("Books in Montreal Library before user request" + monBooks.get(itemID)+"\n");
+					System.out.println("Quantity after reduction" + quantity + "\n");
+					System.out.println("Books in Montreal Library before user request" + monBooks.get(itemID) + "\n");
 					monBooks.put(itemID, monBooks.get(itemID).split(",")[0] + "," + quantity);
 					message = "pass";
-					System.out.println("Montreal User borrow list" + monUserList+"\n");
-					System.out.println("Books in Montreal Library after user request" + monBooks+"\n");
+					System.out.println("Montreal User borrow list" + monUserList + "\n");
+					System.out.println("Books in Montreal Library after user request" + monBooks + "\n");
 				} else {
 					message = "unavailable";
 				}
@@ -109,29 +109,38 @@ public class Montreal {
 			break;
 
 		case "CON":
-			sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays;
-			sendMessage(1111);
-			if (dataReceived.equalsIgnoreCase("pass")) {
-				setUserDetails(userID, itemID, numberOfDays);
-				message = "Issued the book";
-				System.out.println(monUserList + " after Concordia lib operation"+"\n");
-			} else if (dataReceived.equalsIgnoreCase("unavailable")) {
-				message = "Item not available";
-			} else if (dataReceived.equalsIgnoreCase("failed")) {
-				message = "Invalid Item ID";
+			if (ActionServiceImpl.isUserAllowedInterLibraryBorrow("CON", monUserList)) {
+				sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays;
+				sendMessage(1111);
+				if (dataReceived.equalsIgnoreCase("pass")) {
+					setUserDetails(userID, itemID, numberOfDays);
+					message = "Issued the book";
+					System.out.println(monUserList + " after Concordia lib operation" + "\n");
+				} else if (dataReceived.equalsIgnoreCase("unavailable")) {
+					message = "Item not available";
+				} else if (dataReceived.equalsIgnoreCase("failed")) {
+					message = "Invalid Item ID";
+				}
+			} else {
+				message = "User has already borrowed Concordia Library book";
 			}
 			break;
 		case "MCG":
-			sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays;
-			sendMessage(3333);
-			if (dataReceived.equalsIgnoreCase("pass")) {
-				setUserDetails(userID, itemID, numberOfDays);
-				message = "Issued the book";
-				System.out.println(monUserList + " after McGill lib operation"+"\n");
-			} else if (dataReceived.equalsIgnoreCase("unavailable")) {
-				message = "Item not available";
-			} else if (dataReceived.equalsIgnoreCase("failed")) {
-				message = "Invalid Item ID";
+			if (ActionServiceImpl.isUserAllowedInterLibraryBorrow("MCG", monUserList)) {
+				sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays;
+				sendMessage(3333);
+				if (dataReceived.equalsIgnoreCase("pass")) {
+					setUserDetails(userID, itemID, numberOfDays);
+					message = "Issued the book";
+					System.out.println(monUserList + " after McGill lib operation" + "\n");
+				} else if (dataReceived.equalsIgnoreCase("unavailable")) {
+					message = "Item not available";
+				} else if (dataReceived.equalsIgnoreCase("failed")) {
+					message = "Invalid Item ID";
+				}
+			}
+			else {
+				message = "User has already borrowed McGill Library book";
 			}
 			break;
 		}
@@ -145,18 +154,18 @@ public class Montreal {
 			aSocket = new DatagramSocket();
 			byte[] message = sendRequestMessage.getBytes();
 			InetAddress aHost = InetAddress.getByName("localhost");
-			System.out.println("sem length is:" + sendRequestMessage.length()+"\n");
+			System.out.println("sem length is:" + sendRequestMessage.length() + "\n");
 			DatagramPacket request = new DatagramPacket(message, sendRequestMessage.length(), aHost, serverPort);
 			aSocket.send(request);
 			System.out.println("Request message sent from the client to server with port number " + serverPort + " is: "
-					+ new String(request.getData())+"\n");
+					+ new String(request.getData()) + "\n");
 			byte[] buffer = new byte[1000];
 			DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
 			aSocket.receive(reply);
 			dataReceived = null;
 			dataReceived = new String(reply.getData()).trim();
 			System.out.println("Reply received from the server with port number " + serverPort
-					+ " to Montreal server is: " + dataReceived+"\n");
+					+ " to Montreal server is: " + dataReceived + "\n");
 		} catch (SocketException e) {
 			System.out.println("Socket: " + e.getMessage());
 		} catch (IOException e) {
@@ -181,7 +190,7 @@ public class Montreal {
 				DatagramPacket request = new DatagramPacket(buffer, buffer.length);
 				aSocket.receive(request);
 				sendRequestReceived = new String(request.getData());
-				System.out.println("Request received is" + sendRequestReceived+"\n");
+				System.out.println("Request received is" + sendRequestReceived + "\n");
 				String[] params = sendRequestReceived.split(",");
 				func = params[0].trim().toUpperCase();
 				switch (func) {
@@ -224,7 +233,7 @@ public class Montreal {
 			waitMonUserList.add(userID);
 			waitMonBook.put(itemID, waitMonUserList);
 			message = "Added user to Montreal wait list";
-			System.out.println("Wait list of Montreal : " + waitMonBook+"\n");
+			System.out.println("Wait list of Montreal : " + waitMonBook + "\n");
 			break;
 
 		case "CON":

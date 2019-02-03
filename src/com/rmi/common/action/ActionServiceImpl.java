@@ -2,6 +2,7 @@ package com.rmi.common.action;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.rmi.common.User;
 import com.rmi.libraries.Concordia;
 import com.rmi.libraries.McGill;
 import com.rmi.libraries.Montreal;
@@ -16,32 +18,42 @@ import com.rmi.libraries.Montreal;
 public class ActionServiceImpl extends UnicastRemoteObject implements ActionService {
 
 	String operation = "";
+	static boolean isUserAllowed;
+	static int count = 0;
 	HashMap<String, String> fetchBook = new HashMap<String, String>();
 
 	public ActionServiceImpl() throws RemoteException {
 		super();
 	}
 
-	private HashMap<String, String> getAllLibraries() {
-		Iterator<Map.Entry<String, String>> cIterator = Concordia.conBooks.entrySet().iterator();
-		while (cIterator.hasNext()) {
-			Map.Entry<String, String> entry = cIterator.next();
-			fetchBook.put(entry.getKey(), entry.getValue());
+	public static boolean isUserAllowedInterLibraryBorrow(String library, ArrayList<User> userList) {
+		System.out.println(library);
+		System.out.println();
+		System.out.println(userList);
+		count = 0;
+		if (!userList.isEmpty()) {
+			userList.forEach((user) -> {
+				for (Map.Entry<String, Integer> entry : user.getBookInfo().entrySet()) {
+					String key = entry.getKey();
+					System.out.println(key + "\n");
+					if (key.substring(0, 3).equalsIgnoreCase(library)) {
+						count++;
+					}
+				}
+				System.out.println(count + "count");
+				System.out.println("value of boolean " + isUserAllowed);
+			});
+			
+			isUserAllowed = count == 1 ? false : true;
+//			System.out.println("count outside for" +count);
+//			System.out.println();
+//			System.out.println("isUserAllowedInterLibraryBorrrrrrow " + isUserAllowed);
 		}
-		System.out.println("122" + fetchBook);
-		Iterator<Map.Entry<String, String>> mIterator = Montreal.monBooks.entrySet().iterator();
-		while (cIterator.hasNext()) {
-			Map.Entry<String, String> entry1 = mIterator.next();
-			fetchBook.put(entry1.getKey(), entry1.getValue());
+
+		else {
+			isUserAllowed = true;
 		}
-		System.out.println("222" + fetchBook);
-		Iterator<Map.Entry<String, String>> mcIterator = McGill.mcgBooks.entrySet().iterator();
-		while (cIterator.hasNext()) {
-			Map.Entry<String, String> entry2 = mcIterator.next();
-			fetchBook.put(entry2.getKey(), entry2.getValue());
-		}
-		System.out.println("333" + fetchBook);
-		return fetchBook;
+		return isUserAllowed;
 	}
 
 	@Override
@@ -210,7 +222,7 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 		}
 		return operation;
 	}
-	
+
 	@Override
 	public String waitList(String userID, String itemID) throws RemoteException {
 		itemID = itemID.toUpperCase();
@@ -229,26 +241,26 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 	public HashMap<String, String> findItem(String userId, String itemName) {
 		HashMap<String, String> displayBooks = new HashMap<String, String>();
 		for (Map.Entry<String, String> entry : Concordia.conBooks.entrySet()) {
-	        String key = entry.getKey();
-	        String value = entry.getValue();
-	        if(value.split(",")[0].trim().equalsIgnoreCase(itemName)) {
-	        	displayBooks.put(key, value);
-	        }
-	    }
+			String key = entry.getKey();
+			String value = entry.getValue();
+			if (value.split(",")[0].trim().equalsIgnoreCase(itemName)) {
+				displayBooks.put(key, value);
+			}
+		}
 		for (Map.Entry<String, String> entry : Montreal.monBooks.entrySet()) {
-	        String key = entry.getKey();
-	        String value = entry.getValue();
-	        if(value.split(",")[0].trim().equalsIgnoreCase(itemName)) {
-	        	displayBooks.put(key, value);
-	        }
-	    }
+			String key = entry.getKey();
+			String value = entry.getValue();
+			if (value.split(",")[0].trim().equalsIgnoreCase(itemName)) {
+				displayBooks.put(key, value);
+			}
+		}
 		for (Map.Entry<String, String> entry : McGill.mcgBooks.entrySet()) {
-	        String key = entry.getKey();
-	        String value = entry.getValue();
-	        if(value.split(",")[0].trim().equalsIgnoreCase(itemName)) {
-	        	displayBooks.put(key, value);
-	        }
-	    }
+			String key = entry.getKey();
+			String value = entry.getValue();
+			if (value.split(",")[0].trim().equalsIgnoreCase(itemName)) {
+				displayBooks.put(key, value);
+			}
+		}
 		return displayBooks;
 	}
 
@@ -270,7 +282,5 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 
 		return null;
 	}
-
-	
 
 }

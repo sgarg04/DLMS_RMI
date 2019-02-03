@@ -24,7 +24,7 @@ public class McGill extends UnicastRemoteObject {
 
 	public static HashMap<String, String> mcgBooks = new HashMap<String, String>();
 	public static ArrayList<User> mcgUserList = new ArrayList<User>();
-	static List<String> waitMcgUserList =  new ArrayList<String>();
+	static List<String> waitMcgUserList = new ArrayList<String>();
 	static HashMap<String, List<String>> waitMcgBook = new HashMap<String, List<String>>();
 	static String sendRequestMessage, sendRequestReceived, dataReceived, message;
 
@@ -150,7 +150,7 @@ public class McGill extends UnicastRemoteObject {
 				aSocket.close();
 		}
 	}
-	
+
 	private static synchronized void setManagerDetails() {
 		ArrayList<Manager> manager = new ArrayList<Manager>();
 
@@ -182,15 +182,15 @@ public class McGill extends UnicastRemoteObject {
 					if (userID.substring(0, 3).equalsIgnoreCase("MCG")) {
 						setUserDetails(userID, itemID, numberOfDays);
 					} else {
-						message="";
+						message = "";
 					}
 					quantity--;
-					System.out.println("Quantity after reduction" + quantity+"\n");
-					System.out.println("Books in McGill Library before user request" + mcgBooks.get(itemID)+"\n");
+					System.out.println("Quantity after reduction" + quantity + "\n");
+					System.out.println("Books in McGill Library before user request" + mcgBooks.get(itemID) + "\n");
 					mcgBooks.put(itemID, mcgBooks.get(itemID).split(",")[0] + "," + quantity);
 					message = "pass";
-					System.out.println("Concordia User borrow list" + mcgUserList+"\n");
-					System.out.println("Books in McGill Library after user request" + mcgBooks+"\n");
+					System.out.println("Concordia User borrow list" + mcgUserList + "\n");
+					System.out.println("Books in McGill Library after user request" + mcgBooks + "\n");
 				} else {
 					message = "unavailable";
 				}
@@ -200,39 +200,44 @@ public class McGill extends UnicastRemoteObject {
 			break;
 
 		case "CON":
-			sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays;
-			sendMessage(1111);
-			if(dataReceived.equalsIgnoreCase("pass")) {
-				setUserDetails(userID, itemID, numberOfDays);
-				message="pass";
-				System.out.println(mcgUserList+" after concordia lib operation"+"\n");
-			}
-			else if(dataReceived.equalsIgnoreCase("unavailable")) {
-				message="unavailable";
-			}
-			else if(dataReceived.equalsIgnoreCase("failed")) {
-				message="invalid";
+			if (ActionServiceImpl.isUserAllowedInterLibraryBorrow("CON", mcgUserList)) {
+				sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays;
+				sendMessage(1111);
+				if (dataReceived.equalsIgnoreCase("pass")) {
+					setUserDetails(userID, itemID, numberOfDays);
+					message = "pass";
+					System.out.println(mcgUserList + " after concordia lib operation" + "\n");
+				} else if (dataReceived.equalsIgnoreCase("unavailable")) {
+					message = "unavailable";
+				} else if (dataReceived.equalsIgnoreCase("failed")) {
+					message = "invalid";
+				}
+			} else {
+				message = "User has already borrowed Concordia Library book";
 			}
 			break;
 		case "MON":
-			sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays;
-			sendMessage(2222);
-			if(dataReceived.equalsIgnoreCase("pass")) {
-				setUserDetails(userID, itemID, numberOfDays);
-				message="pass";
-				System.out.println(mcgUserList+" after Montreal lib operation"+"\n");
-			}
-			else if(dataReceived.equalsIgnoreCase("unavailable")) {
-				message="unavailable";
-			}
-			else if(dataReceived.equalsIgnoreCase("failed")) {
-				message="invalid";
+			if (ActionServiceImpl.isUserAllowedInterLibraryBorrow("MON", mcgUserList)) {
+				sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays;
+				sendMessage(2222);
+				if (dataReceived.equalsIgnoreCase("pass")) {
+					setUserDetails(userID, itemID, numberOfDays);
+					message = "pass";
+					System.out.println(mcgUserList + " after Montreal lib operation" + "\n");
+				} else if (dataReceived.equalsIgnoreCase("unavailable")) {
+					message = "unavailable";
+				} else if (dataReceived.equalsIgnoreCase("failed")) {
+					message = "invalid";
+				}
+			} else {
+				message = "User has already borrowed Montreal Library book";
 			}
 			break;
 		}
 
 		return message;
 	}
+
 	public static String addUserToWaitlist(String userID, String itemID) {
 		String library = itemID.substring(0, 3).toUpperCase();
 		switch (library) {
@@ -240,7 +245,7 @@ public class McGill extends UnicastRemoteObject {
 			waitMcgUserList.add(userID);
 			waitMcgBook.put(itemID, waitMcgUserList);
 			message = "Added user to McGill wait list";
-			System.out.println("Wait list of McGill : " + waitMcgBook+"\n");
+			System.out.println("Wait list of McGill : " + waitMcgBook + "\n");
 			break;
 
 		case "CON":
