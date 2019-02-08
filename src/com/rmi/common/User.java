@@ -5,11 +5,15 @@ import java.util.HashMap;
 
 public class User {
 	private String userID;
-	private HashMap<String, Integer> bookInfo;
+	private HashMap<Book, Integer> bookInfo;
 	
 	
 
-	public User(String userID, HashMap<String, Integer> bookInfo) {
+	public User() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public User(String userID, HashMap<Book, Integer> bookInfo) {
 		super();
 		this.userID = userID;
 		this.bookInfo = bookInfo;
@@ -47,10 +51,10 @@ public class User {
 			return false;
 		return true;
 	}
-	public HashMap<String, Integer> getBookInfo() {
+	public HashMap<Book, Integer> getBookInfo() {
 		return bookInfo;
 	}
-	public void setBookInfo(HashMap<String, Integer> bookInfo) {
+	public void setBookInfo(HashMap<Book, Integer> bookInfo) {
 		this.bookInfo = bookInfo;
 	}
 	public String getUserID() {

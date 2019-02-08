@@ -1,0 +1,137 @@
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.Montreal startMontrealServer
+INFO: Montreal registry created.
+
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.Montreal startMontrealServer
+INFO: Montreal Server bound in registry 
+
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.Montreal startMontrealServer
+INFO: Setting Library Details 
+
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.Montreal setLibraryDetails
+INFO: Books registered while initialization
+
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.Montreal lambda$1
+INFO: **  MON0987 Computer Organization 1
+
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.Montreal lambda$1
+INFO: **  MON1234 Computer Networks 9
+
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.Montreal lambda$1
+INFO: **  MON2225 Discrete Mathmatical Structure 1
+
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.Montreal setLibraryDetails
+INFO: User registered while initialization
+
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.Montreal lambda$2
+INFO: **  MONU7474 {MON1234=12, MON2225=23}
+
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.Montreal lambda$2
+INFO: **  MONU1622 {CON7878=18, MON2225=2}
+
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.Montreal setLibraryDetails
+INFO: Books WaitList registered while initialization
+
+Feb 08, 2019 1:36:02 AM com.rmi.common.action.ActionServiceImpl <init>
+INFO: Concordia server started
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.McGill startMcGillServer
+INFO: MCGill server started
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.McGill startMcGillServer
+INFO: McGill registry created.
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.McGill startMcGillServer
+INFO: McGill Server bound in registry 
+
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.McGill startMcGillServer
+INFO: Setting Library Details 
+
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.McGill setLibraryDetails
+INFO: Books registered while initialization
+
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.McGill lambda$1
+INFO: **  MCG0956 Complier Design 2
+
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.McGill lambda$1
+INFO: **  MCG4592 JAVA and J2EE 5
+
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.McGill setLibraryDetails
+INFO: User registered while initialization
+
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.McGill lambda$2
+INFO: **  MCGU4747 {MON0987=18, CON2565=10, MCG0956=12, MCG4592=23}
+
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.McGill lambda$2
+INFO: **  MCGU3263 {}
+
+Feb 08, 2019 1:36:02 AM com.rmi.libraries.McGill setLibraryDetails
+INFO: Books WaitList registered while initialization
+
+Feb 08, 2019 1:36:29 AM com.rmi.libraries.Montreal isUserAllowedInterLibraryBorrow
+INFO: Checking User Info for accessibilty for requested book
+Feb 08, 2019 1:36:29 AM com.rmi.libraries.Montreal borrowBookToUser
+INFO: User is allowed to burrow requested book from Concordia
+Feb 08, 2019 1:36:29 AM com.rmi.libraries.Montreal borrowBookToUser
+INFO: ***********************************************
+Feb 08, 2019 1:36:29 AM com.rmi.libraries.Montreal sendMessage
+INFO: Request message sent from the Montreal to server with port number 1111 is: BORROW,MONU7474,CON2565,12,Successfully
+Feb 08, 2019 1:36:29 AM com.rmi.libraries.Concordia receive
+INFO: Request received at Concordia Server
+Feb 08, 2019 1:36:29 AM com.rmi.libraries.Concordia receive
+INFO: Request received is for BORROW
+Feb 08, 2019 1:36:29 AM com.rmi.libraries.Montreal sendMessage
+INFO: Reply received from the server with port number 1111 to Montreal server is: Unavailable :  Book requested is currently not available
+Feb 08, 2019 1:36:35 AM com.rmi.libraries.Concordia receive
+INFO: Request received at Concordia Server
+Feb 08, 2019 1:36:35 AM com.rmi.libraries.Montreal sendMessage
+INFO: Request message sent from the Montreal to server with port number 1111 is: WAIT,MONU7474,CON2565,12
+Feb 08, 2019 1:36:35 AM com.rmi.libraries.Concordia receive
+INFO: Request received is for WAIT
+Feb 08, 2019 1:36:35 AM com.rmi.libraries.Concordia addUserToWaitlist
+INFO: Wait list of Concordia Book List : 
+Feb 08, 2019 1:36:35 AM com.rmi.libraries.Concordia lambda$4
+INFO: **  CON2565 {MONU7474=12}
+
+Feb 08, 2019 1:36:35 AM com.rmi.libraries.Montreal sendMessage
+INFO: Reply received from the server with port number 1111 to Montreal server is: Added user MONU7474 to CON2565 waitlist Successfully !!
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.Concordia removeItemFromuserlist
+INFO: Before Removal of Item Id from library, Concordia userList:{CONU4774={}, CONU1234={CON7878=12, CON2565=23, MCG4592=18}}
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.Concordia removeItemFromuserlist
+INFO: Before Removal of Item Id from library, Concordia waitList:{CON2565={MONU7474=12}}
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.Concordia removeItemFromuserlist
+INFO: After Removal of Item Id from library, Concordia userList:{CONU4774={}, CONU1234={CON7878=12, MCG4592=18}}
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.Concordia removeItemFromuserlist
+INFO: After Removal of Item Id from library, Concordia waitList:{}
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.Concordia removeItemFromLibrary
+INFO: ***********************************************
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.Concordia sendMessage
+INFO: Request message sent from the Concordia to server with port number 2222 is: REMOVE,CON2565
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.Montreal receive
+INFO: Request received at Montreal Server
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.Montreal receive
+INFO: Request received is for REMOVE
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.Montreal removeItemFromuserlist
+INFO: Before Removal of Item Id from library, Montreal userList:{MONU7474={MON1234=12, MON2225=23}, MONU1622={CON7878=18, MON2225=2}}
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.Montreal removeItemFromuserlist
+INFO: Before Removal of Item Id from library, Montreal waitList:{}
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.Montreal removeItemFromuserlist
+INFO: After Removal of Item Id from library, Montreal userList:{MONU7474={MON1234=12, MON2225=23}, MONU1622={CON7878=18, MON2225=2}}
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.Montreal removeItemFromuserlist
+INFO: After Removal of Item Id from library, Montreal waitList:{}
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.Concordia sendMessage
+INFO: Reply received from the server with port number 2222 to Concordia server is: 
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.Concordia removeItemFromLibrary
+INFO: ***********************************************
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.Concordia sendMessage
+INFO: Request message sent from the Concordia to server with port number 3333 is: REMOVE,CON2565
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.McGill receive
+INFO: Request received at Concordia Server
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.McGill receive
+INFO: Request received is for REMOVE
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.McGill removeItemFromuserlist
+INFO: Before Removal of Item Id from library, McGill userList:{MCGU4747={MON0987=18, CON2565=10, MCG0956=12, MCG4592=23}, MCGU3263={}}
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.McGill removeItemFromuserlist
+INFO: Before Removal of Item Id from library, McGill waitList:{}
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.McGill removeItemFromuserlist
+INFO: After Removal of Item Id from library, McGill userList:{MCGU4747={MON0987=18, MCG0956=12, MCG4592=23}, MCGU3263={}}
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.McGill removeItemFromuserlist
+INFO: After Removal of Item Id from library, McGill waitList:{}
+Feb 08, 2019 1:38:41 AM com.rmi.libraries.Concordia sendMessage
+INFO: Reply received from the server with port number 3333 to Concordia server is: 

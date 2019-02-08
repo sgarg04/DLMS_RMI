@@ -28,9 +28,12 @@ public interface ActionService extends Remote {
 	public String borrowItem(String userID, String itemID, int numberOfDays)throws RemoteException;
 
 	// Finds an Item from the Library
-	public HashMap<String, String> findItem(String userId, String itemName)throws RemoteException;
+	public String findItem(String userId, String itemName)throws RemoteException;
 
 	// Returns Item to the Library
 	public String returnItem(String userID, String itemID)throws RemoteException;
+	
+	//Add to waitlist
+	public String waitList(String userID, String itemID, int numberOfDays) throws RemoteException;
 
 }
