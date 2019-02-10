@@ -1,0 +1,13 @@
+Feb 10, 2019 2:14:52 AM com.rmi.client.Client managerOperation
+INFO: Manager with manager id MONM2233opted to add a book
+Feb 10, 2019 2:15:02 AM com.rmi.client.Client managerOperation
+SEVERE: 
+The entered book id has an invalid format
+
+Feb 10, 2019 2:15:30 AM com.rmi.client.Client managerOperation
+INFO: ***** Manager with manager ID MONM2233initiated an add book request for book id 
+mon6756 book name gt quantity 12 in MON library
+Feb 10, 2019 2:15:30 AM com.rmi.client.Client managerOperation
+INFO: ***** Entering addItem operation ****
+Feb 10, 2019 2:15:30 AM com.rmi.client.Client managerOperation
+INFO: Response received from server : Item MON6756 added to the library

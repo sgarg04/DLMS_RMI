@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 
 /*
- * This Interface populates the method used by different managers for implementation
+ * This Interface defines the method used by different managers for implementation
  * @author Shresthi Garg
  * */
 
@@ -27,11 +27,11 @@ public interface ActionService extends Remote {
 	// Borrows an Item to the User
 	public String borrowItem(String userID, String itemID, int numberOfDays) throws RemoteException;
 
-	// Adds user in the wait list of the item
-	public String waitList(String userID, String itemID) throws RemoteException;
+	// Add to waitlist
+	public String waitList(String userID, String itemID, int numberOfDays) throws RemoteException;
 
 	// Finds an Item from the Library
-	public HashMap<String, String> findItem(String userId, String itemName) throws RemoteException;
+	public String findItem(String userId, String itemName) throws RemoteException;
 
 	// Returns Item to the Library
 	public String returnItem(String userID, String itemID) throws RemoteException;

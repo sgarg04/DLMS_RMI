@@ -1,0 +1,22 @@
+Feb 10, 2019 2:11:35 AM com.rmi.client.Client managerOperation
+INFO: Manager with manager id MONM4455opted to add a book
+Feb 10, 2019 2:12:06 AM com.rmi.client.Client managerOperation
+INFO: ***** Manager with manager ID MONM4455initiated an add book request for book id 
+mon4534 book name graph theory quantity 12 in MON library
+Feb 10, 2019 2:12:06 AM com.rmi.client.Client managerOperation
+INFO: ***** Entering addItem operation ****
+Feb 10, 2019 2:12:06 AM com.rmi.client.Client managerOperation
+INFO: Response received from server : Item MON4534 added to the library
+Feb 10, 2019 2:12:10 AM com.rmi.client.Client managerOperation
+INFO: Manager with manager id MONM4455opted to add a book
+Feb 10, 2019 2:12:14 AM com.rmi.client.Client managerOperation
+SEVERE: 
+The entered book id has an invalid format
+
+Feb 10, 2019 2:12:26 AM com.rmi.client.Client managerOperation
+INFO: ***** Manager with manager ID MONM4455initiated an add book request for book id 
+mon4567 book name ds quantity 12 in MON library
+Feb 10, 2019 2:12:26 AM com.rmi.client.Client managerOperation
+INFO: ***** Entering addItem operation ****
+Feb 10, 2019 2:12:26 AM com.rmi.client.Client managerOperation
+INFO: Response received from server : Item MON4567 added to the library

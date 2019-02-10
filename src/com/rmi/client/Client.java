@@ -1,206 +1,476 @@
 package com.rmi.client;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.HashMap;
-import java.util.Scanner;
-import java.util.regex.Pattern;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import com.rmi.common.action.ActionService;
 
 public class Client {
-	static String library, registryURL, operatorID, userID, managerID;
-	static int rmiPort;
+	static String library, registryURL, operatorID, userID, managerID, serverName, itemId;
+	static char operatorRole;
+	static int rmiPort, quantity;
+	static boolean isIDCorrect, isItemIdCorrect;
+	static Logger logger = Logger.getLogger(Client.class.getName());
+	static private FileHandler fileHandler;
+	static private SimpleFormatter formatterTxt;
+	static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+	static ActionService serverRef;
+	static boolean isValidManagerFlag;
+	static boolean isValidUserFlag;
+
+	private static void getregistryURI(String library)
+			throws MalformedURLException, RemoteException, NotBoundException, IOException {
+
+		if (library.equals("CON")) {
+			rmiPort = 4444;
+			registryURL = "rmi://localhost:" + rmiPort + "/CON";
+		} else if (library.equals("MON")) {
+			rmiPort = 5555;
+			registryURL = "rmi://localhost:" + rmiPort + "/MON";
+		} else if (library.equals("MCG")) {
+			rmiPort = 6666;
+			registryURL = "rmi://localhost:" + rmiPort + "/MCG";
+		}
+		serverRef = (ActionService) Naming.lookup(registryURL);
+	}
+
+//	Function to check whether the entered manager Id is authorized
+//	@return boolean value of isValidManagerFlag
+//	@params String array of manager and manager id entered
+
+	private static boolean isValidManager(String[] managerIDs, String managerID) {
+		int c = 0;
+		for (String id : managerIDs) {
+			c = id.equalsIgnoreCase(managerID) ? c = c + 1 : c;
+		}
+		isValidManagerFlag = (c == 1) ? true : false;
+		return isValidManagerFlag;
+	}
+
+//	Function to check whether the entered user Id is authorised
+//	@return boolean value of isValidUserFlag
+//	@params String array of user and user id entered
+
+	private static boolean isValidUser(String[] userIDs, String userID) {
+		int c = 0;
+		for (String id : userIDs) {
+			c = id.equalsIgnoreCase(userID) ? c = c + 1 : c;
+		}
+		isValidUserFlag = (c == 1) ? true : false;
+		return isValidUserFlag;
+	}
 
 	private static boolean isOperatorIdCorrect(String operatorID) {
-		boolean isIDCorrect = false;
-		if (operatorID.length() == 8) {
+		isIDCorrect = false;
+
+		if (operatorID.length() == 8 && operatorID != null) {
 			String serverName = operatorID.substring(0, 3);
 			if (serverName.equalsIgnoreCase("CON") || serverName.equalsIgnoreCase("MON")
 					|| serverName.equalsIgnoreCase("MCG")) {
 				if (operatorID.charAt(3) == 'M' || operatorID.charAt(3) == 'U') {
 					if ((operatorID.substring(4, 8)).matches("[0-9]+")) {
-//						System.out.println(operatorID.substring(4, 8));
 						isIDCorrect = true;
 					}
 				}
 			}
 		} else {
+
 			isIDCorrect = false;
-			System.out.println("Invalid ID, Try again with valid credentials! \n");
 		}
 		return isIDCorrect;
 
 	}
 
-//	Backup code written
+	private static boolean isItemIdCorrect(String serverName, String itemId) {
+		isItemIdCorrect = false;
+
+		if (itemId.length() == 7 && itemId != null) {
+			String libraryName = itemId.substring(0, 3);
+			if (libraryName.equalsIgnoreCase(serverName)) {
+				if ((itemId.substring(3, 7)).matches("[0-9]+")) {
+					isItemIdCorrect = true;
+				}
+			}
+
+		} else {
+
+			isItemIdCorrect = false;
+		}
+		return isItemIdCorrect;
+
+	}
+
+	private static boolean isItemIdCorrect(String itemId) {
+		isItemIdCorrect = false;
+		if (itemId.length() == 7 && itemId != null) {
+			String serverName = itemId.substring(0, 3);
+			if (serverName.equalsIgnoreCase("CON") || serverName.equalsIgnoreCase("MON")
+					|| serverName.equalsIgnoreCase("MCG")) {
+				if ((itemId.substring(3, 7)).matches("[0-9]+")) {
+					isItemIdCorrect = true;
+				}
+			}
+		} else {
+			isItemIdCorrect = false;
+		}
+		return isItemIdCorrect;
+	}
+
+	private static void loggingOperator(String operator, String operatorID) throws SecurityException, IOException {
+		fileHandler = new FileHandler(
+				"/Users/SGarg/Shresthi/Winter 2019/DS-COMP 6231/assignment/DLMS_DS2019/DistributedLibraryManagementSystem/Logs/Client/"
+						+ operator + "/" + operatorID + ".log");
+
+		formatterTxt = new SimpleFormatter();
+		fileHandler.setFormatter(formatterTxt);
+		logger.addHandler(fileHandler);
+		logger.setUseParentHandlers(false);
+	}
+
+	public static void managerOperation(String managerID) throws IOException {
+		System.out.println("\nHello Manager,");
+		String proceedM = "yes";
+		while (proceedM.equalsIgnoreCase("yes")) {
+			System.out.println("\nEnter your choice : " + "\n1. Type 1 to add a book to the library."
+					+ "\n2. Type 2 to remove a book from the library."
+					+ "\n3. Type 3 to list all the available books in the library.");
+			System.out.print("\nEnter your choice : ");
+			String managerCommand = (reader.readLine());
+			switch (managerCommand) {
+
+			case "1":
+				logger.info("Manager with manager id " + managerID + "opted to add a book");
+				System.out.println("\nPlease provide the following details to add a book in the library:");
+				isItemIdCorrect = false;
+				while (!isItemIdCorrect) {
+					System.out.print("\nEnter the book id : ");
+					itemId = reader.readLine();
+					isItemIdCorrect = isItemIdCorrect(serverName, itemId);
+					if (!isItemIdCorrect) {
+						logger.log(Level.SEVERE, "\nThe entered book id has an invalid format\n");
+						System.err.println("\nSorry! The entered book id has an invalid format \n");
+					}
+				}
+				System.out.print("\nEnter the associated book name : ");
+				String itemName = (reader.readLine());
+				Boolean loop = true;
+				while (loop) {
+					System.out.print("\nEnter the quantity of book(s) to be added : ");
+					int quantity = Integer.parseInt(reader.readLine());
+					if (quantity > 0) {
+						System.out.println("\nAdding book with book id " + itemId + " and book name " + itemName
+								+ " and quantity " + quantity);
+						logger.info("***** Manager with manager ID " + managerID
+								+ "initiated an add book request for book id \n" + itemId + " book name " + itemName
+								+ " quantity " + quantity + " in " + serverName + " library");
+						logger.info("***** Entering addItem operation ****");
+						String result = serverRef.addItem(operatorID, itemId, itemName, quantity);
+						logger.info("Response received from server : " + result);
+						System.out.println("\n" + result);
+						loop = false;
+					} else {
+						logger.log(Level.SEVERE, "\nInvalid quantity entered. Entered book's quantity is " + quantity);
+						System.err.println("\nPlease enter a valid quantity. It cannot be less than or equal to zero.");
+					}
+				}
+
+				break;
+
+			case "2":
+				logger.info("Manager with manager id " + managerID + "opted to delete/reduce a book");
+				System.out.println("\nPlease provide the below details to perform the requested operation in library:");
+				isItemIdCorrect = false;
+				while (!isItemIdCorrect) {
+					System.out.print("\nEnter the book id : ");
+					itemId = (reader.readLine());
+					isItemIdCorrect = isItemIdCorrect(serverName, itemId);
+					if (!isItemIdCorrect)
+						logger.log(Level.SEVERE, "\nInvalid Item Id, Enterred Item id : " + itemId);
+					System.err
+							.println("The given book id has an invalid format. Please try again with a valid book id.");
+				}
+				String output;
+				Boolean correctchoice = true;
+				while (correctchoice) {
+					System.out.println("\nPlease chose the following operation for removal : "
+							+ "\nType 1 to Remove the entire item from library."
+							+ "\nType 2 to Decrease the quantity of the book.");
+					System.out.print("\nEnter your choice : ");
+					int choice = Integer.parseInt(reader.readLine());
+					if (choice == 1) {
+						quantity = -1;
+						logger.info("***** Manager with manager ID " + managerID
+								+ "initiated an remove book request for book id " + itemId + " in " + serverName
+								+ " library");
+						logger.info("***** Entering removeItem operation to remove the entire book ****");
+						output = serverRef.removeItem(operatorID, itemId, quantity);
+						logger.info("Response received from server : " + output);
+						System.out.println(output);
+						correctchoice = false;
+					} else if (choice == 2) {
+						loop = true;
+						while (loop) {
+							System.out.print("\nEnter the quantity by which the book's quantity be reduced :");
+							quantity = Integer.parseInt(reader.readLine());
+							if (quantity > 0) {
+								logger.info("***** Manager with manager ID " + managerID
+										+ "initiated an reduce quantity of book request for book id " + itemId
+										+ " with quantity " + quantity + " in " + serverName + " library");
+								logger.info("***** Entering removeItem operation to remove the entire book ****");
+								output = serverRef.removeItem(operatorID, itemId, quantity);
+								logger.info("Response received from server : " + output);
+								if (!output.contains("INVALID")) {
+									System.out.println(output + "\n");
+									loop = false;
+									correctchoice = false;
+								} else if (output.equals("Invalid Quantity")) {
+									logger.log(Level.SEVERE, "(The quantity of books available for the book id" + itemId
+											+ " is lesser than the quantity provided) \nInvalid quantity, Entered quantity : "
+											+ quantity);
+									System.err.println("\nThe entered quantity is invalid."
+											+ "(The quantity of books available for the book id" + itemId
+											+ " is lesser than the quantity provided)");
+								} else if (output.equals("Invalid Book")) {
+									logger.log(Level.SEVERE, "Invalid book id, Entered book id : " + itemId);
+									System.err.println(
+											"\nThe entered book id has an invalid format. Please try again with a valid book id.");
+									loop = false;
+									correctchoice = false;
+								}
+
+							} else {
+								logger.log(Level.SEVERE, "Invalid quantity, Entered quantity : " + quantity);
+								System.err.println(
+										"\nPlease enter a valid quantity. It can not be less than or equals to zero \n");
+
+							}
+						}
+					} else
+						System.err.println("\nSorry, it was an incorrect choice. Please enter a correct choice.");
+				}
+
+				break;
+
+			case "3":
+				logger.info("Manager with manager id " + managerID + "opted to list all the books in the library");
+				HashMap<String, String> bookList = new HashMap<String, String>();
+				logger.info("***** Entering listItemAvailability operation to list all the books in library ****");
+				bookList = serverRef.listItemAvailability(operatorID);
+				logger.info("Response received from server : " + bookList);
+				System.out.println("\nBooks Available in Library are : ");
+				bookList.forEach(
+						(k, v) -> System.out.println(("\n* " + k + " " + v.split(",")[0] + " " + v.split(",")[1])));
+
+				break;
+
+			default:
+				logger.log(Level.SEVERE, "\nInvalid choice entered by user");
+				System.err.println("\nPlease enter a valid choice.");
+
+			}
+
+			System.out.println("Do you want continue further operation - Yes/No ");
+			proceedM = (reader.readLine());
+			if (!proceedM.equalsIgnoreCase("yes")) {
+				System.out.println("Thank You\n");
+				System.out.println("Signing out User...\n");
+			}
+
+		}
+	}
+
+	public static void userOperation(String userID) throws IOException {
+		System.out.println("\nHello User,");
+		String proceeduser = "yes";
+		String operation = "";
+		String itemId = "";
+		while (proceeduser.equalsIgnoreCase("yes")) {
+			System.out.println("\nEnter your choice : \n" + "\n1. Type 1 to borrow a book from the library."
+					+ "\n2. Type 2 to find a book in the library."
+					+ "\n3. Type 3 to return a book back to the library \n");
+			System.out.print(" Enter your choice : ");
+			String managerCommand = (reader.readLine());
+			switch (managerCommand) {
+			case "1":
+				logger.info("User with user id " + userID + "opted for borrow a book");
+				System.out.println("\nPlease provide the following details to borrow book from library: \n");
+				isItemIdCorrect = false;
+				while (!isItemIdCorrect) {
+					System.out.print("\nEnter item id of the book : ");
+					itemId = (reader.readLine());
+					isItemIdCorrect = isItemIdCorrect(itemId);
+					if (!isItemIdCorrect)
+						System.err.println("\nInvalid Item Id: Enter Valid Item id \n");
+				}
+
+				Boolean loop = true;
+				while (loop) {
+					System.out.print("\nEnter the number of days you wish to borrow the book : ");
+					int numberOfDays = Integer.parseInt(reader.readLine());
+					if (numberOfDays > 0) {
+						logger.info("***** User with user ID " + userID + "initiated a borrow request for a book "
+								+ itemId + "in " + serverName + " library");
+						logger.info("***** Entering borrowItem operation ****");
+						operation = serverRef.borrowItem(userID, itemId, numberOfDays);
+						if (operation.contains("Unavailable")) {
+							System.out.println("\nBook with item ID: " + itemId + " is unavailable!");
+							logger.info("Response received from server : " + operation);
+							System.out.println("\nDo you wish to enter into a waitlist?  Yes or No : ");
+							String choice = reader.readLine();
+							if (choice.equalsIgnoreCase("Yes")) {
+								logger.info("User opted to enter a waitlist");
+								logger.info("***** User with user ID " + userID
+										+ "initiated a waitlist request for a book " + itemId + "in " + serverName
+										+ "library for number of days: " + numberOfDays);
+								logger.info("***** Entering waitList operation ****");
+								operation = serverRef.waitList(userID, itemId, numberOfDays);
+								logger.info("Response received from server : " + operation);
+								System.out.println(operation + "\n");
+							} else {
+								System.out.println("\nAlright! We did not add you in wait list.\n");
+								logger.info("User did not opt to enter a waitlist");
+							}
+
+						} else {
+							System.out.println("\nBorrowed book with Book id : " + itemId + " for " + numberOfDays
+									+ " number of days.");
+							logger.info("Response received from server : " + operation);
+							System.out.println(operation);
+						}
+						loop = false;
+					} else {
+						logger.log(Level.SEVERE, "Invalid number of days entered");
+						System.err.println(
+								"Please enter a valid number. You cannot borrow a book for less than or equals to Zero \n");
+					}
+				}
+				break;
+
+			case "2":
+				logger.info("User with user id " + userID + "opted to find a book");
+				System.out.print("\nEnter item name of the book : ");
+				String itemName = (reader.readLine());
+				String bookList = "";
+				logger.info("User with user id " + userID + "opted to find a book with name as " + itemName);
+				logger.info("***** Entering findItem operation ****");
+				bookList = serverRef.findItem(userID, itemName);
+				logger.info("Response received from server : " + bookList);
+				System.out.println(bookList);
+				if (!bookList.equals("")) {
+					System.out.println("\nBooks Available in Library with '" + itemName + "':\n");
+					String[] books = bookList.split("'");
+					for (String book : books) {
+						System.out.println("\n* " + book.split("-")[0] + " " + book.split("-")[1]);
+					}
+
+				} else {
+					logger.log(Level.SEVERE, "\nNo book available with the entered name");
+					System.out.println("\nNo book available with the entered name");
+				}
+
+				break;
+
+			case "3":
+				logger.info("User with user id " + userID + "opted to return a book");
+				System.out.println("\nPlease provide the following details to return back the book to library:");
+				isItemIdCorrect = false;
+				while (!isItemIdCorrect) {
+					System.out.println("Enter item id of the book : ");
+					itemId = (reader.readLine());
+					isItemIdCorrect = isItemIdCorrect(itemId);
+					if (!isItemIdCorrect)
+						System.err.println("The entered book id has an invalid book format.\n");
+				}
+				logger.info("User with user id " + userID + "opted to return a book with item id " + itemId);
+				logger.info("***** Entering returnItem operation ****");
+				operation = serverRef.returnItem(userID, itemId);
+				System.out.println(operation);
+				logger.info("Response received from server : " + operation);
+
+				break;
+
+			default:
+				logger.log(Level.SEVERE, "\nInvalid choice entered by user");
+				System.err.println("\nPlease make a valid choice.");
+
+			}
+
+			System.out.println("\nDo you want continue further operation? Yes or No ");
+			proceeduser = (reader.readLine());
+			if (!proceeduser.equalsIgnoreCase("Yes")) {
+				System.out.println("\nThank You");
+				System.out.println("\nSigning out ...");
+			}
+
+		}
+	}
+
 	public static void main(String[] args) throws Exception {
+		String[] managerIDs = { "CONM1122", "CONM2233", "CONM3344", "CONM4455", "MONMS1122", "MONM2233", "MONM3344",
+				"MONM4455", "MCGM1122", "MCGM2233", "MCGM3344", "MCGM4455" };
+		String[] userIDs = { "CONU1122", "CONU2233", "CONU3344", "CONU4455", "MONUS1122", "MONU2233", "MONU3344",
+				"MONU4455", "MCGU1122", "MCGU2233", "MCGU3344", "MCGU4455" };
 		boolean stopRunning = false;
-		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
 		try {
 			System.setSecurityManager(new SecurityManager());
 
-			System.out.print("Enter your 8 digit User Id or Manager Id : ");
-			String operatorID = (reader.readLine()).toUpperCase();
-			char operator = operatorID.charAt(3);
-			String library = operatorID.substring(0, 3).trim().toUpperCase();
-			boolean isIDCorrect = isOperatorIdCorrect(operatorID);
+			while (!stopRunning) {
+				System.out.println("\n** Welcome to Library **");
+				System.out.println("\n(At any point of time type 'Quit' to exit)");
+				System.out.print("\nPlease enter a valid User Id or Manager Id : ");
+				operatorID = (reader.readLine()).toUpperCase();
 
-			if (operatorID == null || operatorID.equalsIgnoreCase("quit") && isIDCorrect != true) {
-				stopRunning = true;
+				if (operatorID.equalsIgnoreCase("quit")) {
+					stopRunning = operatorID.equalsIgnoreCase("quit");
+					System.out.println("\nTada! Thank you for visiting us! ");
 
-			} else {
+				} else if (!isOperatorIdCorrect(operatorID)) {
 
-				while (!stopRunning) {
+					System.out.println("Please enter a valid Manager or User ID \n");
+
+				} else {
+					operatorRole = operatorID.charAt(3);
+					serverName = operatorID.substring(0, 3);
+					getregistryURI(serverName);
 					try {
-						System.out.println("Library is :"+ library);
-						if(library.equals("CON")) {
-							rmiPort = 4444;
-							registryURL =
-					        		 "rmi://localhost:" + rmiPort + "/CON";
-						}
-						else if(library.equals("MON")) {
-							rmiPort = 5555;
-							registryURL = 
-					        		 "rmi://localhost:" + rmiPort + "/MON";
-						}
-						else if(library.equals("MCG")) {
-							rmiPort = 6666;
-							registryURL = 
-					        		 "rmi://localhost:" + rmiPort + "/MCG";
-						}
-						ActionService serverRef = (ActionService) Naming.lookup(registryURL);
-						String temp1 = operatorID;
-
-						int stringLength = temp1.length();
-						if (stringLength == 8) {
-							switch (operator) {
-							case 'M':
-								managerID = operatorID;
-								String managerWish = "No";
-								while (managerWish.equalsIgnoreCase("No")) {
-									System.out.println(
-											"Hello Manager, \n Enter your choice : \n 1. Type 1 to add an item to Library \n 2. Type 2 to remove an item from the Library \n 3. Type 3 to list all the available items in the library \n");
-									int managerCommand = Integer.parseInt(reader.readLine());
-									switch (managerCommand) {
-									case 1:
-										System.out.println("Please provide the following details to add an item to"
-												+ library + " Library");
-										System.out.println("Enter item id to be added");
-										String itemID = (reader.readLine());
-										System.out.println("Enter item name to added");
-										String itemName = (reader.readLine());
-										System.out.println("Enter the quantity of item to be added");
-										int quantity = Integer.parseInt(reader.readLine());
-										String result = serverRef.addItem(managerID, itemID, itemName, quantity);
-										System.out.println(result);
-
-										break;
-
-									case 2:
-										System.out.println(
-												"Do you wish to \n 1. Remove the entire item from library \n 2. Decrease the quantity of item \n");
-										int choice = Integer.parseInt(reader.readLine());
-
-										System.out.println("Please provide the following details to remove an item from "
-												+ library + " Library");
-										if (choice == 1) {
-											System.out.println("Enter item id to be removed");
-											itemID = (reader.readLine());
-											quantity = -1;
-										} else {
-											System.out.println("Enter item id to be reduced");
-											itemID = (reader.readLine());
-											System.out.println("Enter the quantity of item to be reduced");
-											quantity = Integer.parseInt(reader.readLine());
-										}
-										String operation = serverRef.removeItem(managerID, itemID, quantity);
-										System.out.println(operation);
-										break;
-									case 3:
-										HashMap<String, String> bookList = new HashMap<String, String>();
-										bookList=serverRef.listItemAvailability(managerID);
-										System.out.println("Books Available in Library are :\n");
-										bookList.forEach((k, v) -> System.out.println(("** "+k + " " + v.split(",")[0]+" " + v.split(",")[1]+"\n")));
-										break;
-									}
-									System.out.println("Do you wish to continue? Yes or No");
-									managerWish = reader.readLine();
-								} 
-								System.out.println("Thank you!");
-								break;
-							case 'U':
-								userID = operatorID;
-								String userWish = "No";
-								while (userWish.equalsIgnoreCase("No")) {
-									System.out.println(
-											"Hello User, \n Enter your choice : \n 1. Type 1 to borrow an item to Library \n 2. Type 2 to find an item in the Library \n 3. Type 3 to return an item to the library");
-									int userCommand = Integer.parseInt(reader.readLine());
-									switch (userCommand) {
-									case 1:
-										System.out.println(
-												"Please provide the following details to borrow book from Library \n");
-										System.out.println("Enter item id of the book");
-										String itemID = (reader.readLine());
-										System.out.println("Enter the number of days you wish to borrow the book \n");
-										int numberOfDays = Integer.parseInt(reader.readLine());
-										String operation = serverRef.borrowItem(userID, itemID, numberOfDays);
-										if(operation.equalsIgnoreCase("unavailable")) {
-											System.out.println("Book with item ID: "+itemID+" is unavailable \n");
-											System.out.println("Do you wish to enter into a waitlist?  Yes or No");
-											String choice = reader.readLine();
-											if(choice.equalsIgnoreCase("Yes")) {
-												operation = serverRef.waitList(userID, itemID);
-												System.out.println(operation);
-											}
-											else {
-												System.out.println("Not added to the queue");
-											}
-										
-										}
-										System.out.println(operation);
-										break;
-									case 2:
-										System.out.println("Enter item name of the book");
-										String itemName = (reader.readLine());
-										HashMap<String, String> bookList = new HashMap<String, String>();
-										bookList=serverRef.findItem(userID, itemName);
-										if(!bookList.isEmpty()) {
-											System.out.println("Books Available in Library with '"+itemName+ "':\n");
-											bookList.forEach((k, v) -> System.out.print((k +" " + v.split(",")[1]+","+" ")));
-											System.out.println();
-										}
-										else {
-											System.out.println("No book available with that name!");
-										}
-										
-										break;
-									case 3:
-										System.out.println("Provide the details of the item you wish to return");
-
-										System.out.println("Enter item id to be returned");
-										itemID = (reader.readLine());
-										serverRef.returnItem(userID, itemID);
-										break;
-									}
-									System.out.println("\nDo you wish to continue? Yes or No");
-									userWish = reader.readLine();
-								}
-								System.out.println("Thank you!");
-								break;
-
+						switch (operatorRole) {
+						case 'M':
+							if (!isValidManager(managerIDs, operatorID)) {
+								System.out.println(
+										"\nSorry! You are not an authorized Manager to avail library service.");
+							} else {
+								loggingOperator("Manager", operatorID);
+								managerOperation(operatorID);
 							}
-						} else {
-							System.out.println("Please enter a valid 8 digit ID \n");
-							temp1 = null;
+
+							break;
+
+						case 'U':
+							if (!isValidUser(userIDs, operatorID)) {
+								System.out.println("\nSorry! You are not an authorized User to avail library service.");
+							} else {
+								loggingOperator("User", operatorID);
+								userOperation(operatorID);
+							}
+							break;
 						}
 					} catch (NumberFormatException e) {
 						e.printStackTrace();
 					}
-
 				}
 			}
+
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

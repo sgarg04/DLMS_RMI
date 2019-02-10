@@ -9,33 +9,34 @@ import java.net.SocketException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
-import com.rmi.common.Manager;
-import com.rmi.common.User;
+import com.rmi.common.action.ActionService;
 import com.rmi.common.action.ActionServiceImpl;
 
-public class McGill extends UnicastRemoteObject {
+public class McGill {
 
-	public static HashMap<String, String> mcgBooks = new HashMap<String, String>();
-	public static ArrayList<User> mcgUserList = new ArrayList<User>();
-	static List<String> waitMcgUserList = new ArrayList<String>();
-	static HashMap<String, List<String>> waitMcgBook = new HashMap<String, List<String>>();
-	static String sendRequestMessage, sendRequestReceived, dataReceived, message;
+	public static HashMap<String, String> Books = new HashMap<String, String>();
+	public static HashMap<String, HashMap<String, Integer>> userlist = new HashMap<String, HashMap<String, Integer>>();
+
+	public static HashMap<String, Integer> waitUserList = new HashMap<String, Integer>();
+	public static HashMap<String, HashMap<String, Integer>> waitlistBook = new HashMap<String, HashMap<String, Integer>>();
+
+	private static String sendRequestMessage;
+	private static String sendRequestReceived;
+	private static String dataReceived;
+	private static String message;
+	private static Logger logger;
+	static private FileHandler fileHandler;
 
 	protected McGill() throws RemoteException {
 		super();
-	}
-
-	public static void main(String[] args) throws Exception {
-
-//		populateDetails();
-
 	}
 
 	public static void startMcGillServer() throws Exception {
@@ -46,21 +47,35 @@ public class McGill extends UnicastRemoteObject {
 		Thread thread = new Thread(task);
 		thread.start();
 
-		ActionServiceImpl mcgStub = new ActionServiceImpl();
-
-		System.out.println("McGill server started");
-
+		ActionService mcgStub = new ActionServiceImpl();
+		logger = Logger.getLogger(McGill.class.getName());
+		logger.setUseParentHandlers(false);
+		logger.info("MCGill server started");
 		try {
-			// special exception handler for registry creation
+			try {
+				// This block configure the logger with handler and formatter
+				fileHandler = new FileHandler(
+						"/Users/SGarg/Shresthi/Winter 2019/DS-COMP 6231/assignment/DLMS_DS2019/DistributedLibraryManagementSystem/Logs/Server/McGill.log");
+				logger.addHandler(fileHandler);
+
+				SimpleFormatter formatter = new SimpleFormatter();
+				fileHandler.setFormatter(formatter);
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			LocateRegistry.createRegistry(6666);
 			System.out.println("McGill registry created.");
+			logger.info("McGill registry created.");
 		} catch (RemoteException e) {
 			// do nothing, error means registry already exists
 			System.out.println("McGill registry already exists.");
+			logger.info("McGill registry created.");
 		}
 
-		// Instantiate McGill Server and bind this object instance to the name
-		// "McGill Server"
+		// Instantiate McGill Server and bind this object instance to the name "McGill
+		// Server"
 		try {
 			Naming.rebind("rmi://localhost:6666/MCG", mcgStub);
 		} catch (RemoteException e) {
@@ -71,8 +86,9 @@ public class McGill extends UnicastRemoteObject {
 			e.printStackTrace();
 		}
 		System.out.println("McGill Server bound in registry \n");
-
+		logger.info("McGill Server bound in registry \n");
 		System.out.println("Setting Library Details \n");
+		logger.info("Setting Library Details \n");
 		setLibraryDetails();
 
 	}
@@ -83,26 +99,28 @@ public class McGill extends UnicastRemoteObject {
 			aSocket = new DatagramSocket();
 			byte[] message = sendRequestMessage.getBytes();
 			InetAddress aHost = InetAddress.getByName("localhost");
-			System.out.println("sem length is:" + sendRequestMessage.length());
+
 			DatagramPacket request = new DatagramPacket(message, sendRequestMessage.length(), aHost, serverPort);
 			aSocket.send(request);
-			System.out.println("Request message sent from the client to server with port number " + serverPort + " is: "
+			logger.info("Request message sent from the MCGill to server with port number " + serverPort + " is: "
 					+ new String(request.getData()));
 			byte[] buffer = new byte[1000];
 			DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
 			aSocket.receive(reply);
 			dataReceived = null;
 			dataReceived = new String(reply.getData()).trim();
-			System.out.println("Reply received from the server with port number " + serverPort
-					+ " to McGill server is: " + dataReceived);
+			logger.info("Reply received from the server with port number " + serverPort + " to McGill server is: "
+					+ dataReceived);
 		} catch (SocketException e) {
 			System.out.println("Socket: " + e.getMessage());
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("IO: " + e.getMessage());
 		} finally {
-			if (aSocket != null)
+			if (aSocket != null) {
 				aSocket.close();
+				fileHandler.close();
+			}
 		}
 	}
 
@@ -112,27 +130,43 @@ public class McGill extends UnicastRemoteObject {
 			String func = null;
 			String repMessage = "";
 			aSocket = new DatagramSocket(3333);
-
-			System.out.println("Server 3333 Started............");
+			System.out.println("Server 3333 Started ............");
 			while (true) {
 				byte[] buffer = new byte[1000];
 				DatagramPacket request = new DatagramPacket(buffer, buffer.length);
 				aSocket.receive(request);
 				sendRequestReceived = new String(request.getData());
-				System.out.println("Request received is" + sendRequestReceived);
+				logger.info("Request received at Concordia Server");
 				String[] params = sendRequestReceived.split(",");
 				func = params[0].trim().toUpperCase();
+				logger.info("Request received is for " + func);
 				switch (func) {
 				case "BORROW":
 					String userID = params[1].trim();
 					String itemID = params[2].trim();
 					int numberOfDays = Integer.parseInt(params[3].trim());
+					message = params[4].trim();
 					repMessage = borrowBookToUser(userID, itemID, numberOfDays);
 					break;
 				case "WAIT":
 					userID = params[1].trim();
 					itemID = params[2].trim();
-					repMessage = addUserToWaitlist(userID, itemID);
+					numberOfDays = Integer.parseInt(params[3].trim());
+					repMessage = addUserToWaitlist(userID, itemID, numberOfDays);
+					break;
+				case "RETURN":
+					userID = params[1].trim();
+					itemID = params[2].trim();
+					message = params[3].trim();
+					repMessage = returnBookFromUser(userID, itemID);
+					break;
+				case "FIND":
+					String itemName = params[1].trim();
+					repMessage = fetchonItemName(Books, itemName).toString();
+					break;
+				case "REMOVE":
+					itemID = params[1].trim();
+					removeItemFromuserlist(itemID);
 					break;
 				}
 
@@ -146,91 +180,187 @@ public class McGill extends UnicastRemoteObject {
 		} catch (IOException e) {
 			System.out.println("IO: " + e.getMessage());
 		} finally {
-			if (aSocket != null)
+			if (aSocket != null) {
 				aSocket.close();
+				fileHandler.close();
+			}
+
 		}
 	}
 
-	private static synchronized void setManagerDetails() {
-		ArrayList<Manager> manager = new ArrayList<Manager>();
+	public static boolean isUserAllowedInterLibraryBorrow(String library, String userID) {
 
+		String key;
+		HashMap<String, Integer> userinfo;
+		logger.info("Checking User Info for accessibilty for requested book");
+		Boolean isUserAllowed = false;
+		int count = 0;
+		userinfo = userlist.get(userID);
+		if (!userinfo.isEmpty()) {
+			Iterator<Entry<String, Integer>> iterator = userinfo.entrySet().iterator();
+			while (iterator.hasNext()) {
+				Entry<String, Integer> thisEntry = iterator.next();
+				key = thisEntry.getKey();
+				if (key.substring(0, 3).equalsIgnoreCase(library)) {
+					count++;
+				}
+			}
+
+			isUserAllowed = (count == 1 ? false : true);
+		} else {
+			isUserAllowed = true;
+		}
+		if (isUserAllowed)
+			message = "Successfully";
+		return isUserAllowed;
 	}
 
-	public static synchronized void setUserDetails(String userID, String itemID, int numberOfDays) {
-
+	private static String setUserDetails(String userID, String itemID, int numberOfDays) {
 		HashMap<String, Integer> temp = new HashMap<String, Integer>();
-		temp.put(itemID, numberOfDays);
-		User userObj = new User(userID, temp);
-		mcgUserList.add(userObj);
+//		if (userlist.containsKey(userID)) {
+			temp = userlist.get(userID);
+			if (!temp.containsKey(itemID) || temp.isEmpty() || temp == null) {
+				temp.put(itemID, numberOfDays);
+				userlist.put(userID, temp);
+				logger.info(
+						"Item " + itemID + "Successfully Borrowed by User " + userID + ".Added to user borrowed List");
+				return "Item " + itemID + "Successfully Borrowed by User " + userID + ".Added to user borrowed List";
+			} else {
+				System.err.println("Item already available in user's burrowed list");
+				logger.info("Item already available in user's burrowed list");
+				return "Item already available in user's burrowed list,Can't Borrow Same Item Again.";
+			}
+
+		} 
+//	else {
+//			logger.info("User with User ID : " + userID + " does not exist\n");
+//			return "User with User ID : " + userID + " does not exist.";
+//		}
+//
+//	}
+
+	private static String updateUserBookDetails(String userID, String itemID) {
+		HashMap<String, Integer> temp = new HashMap<String, Integer>();
+		if (userlist.containsKey(userID)) {
+			temp = userlist.get(userID);
+			if (temp.containsKey(itemID)) {
+				temp.remove(itemID);
+				userlist.put(userID, temp);
+				logger.info(" Item returned successfully to the Library and removed from user borrowed list.");
+				return "Item returned Successfully to the Library and removed from user borrowed list.";
+			} else {
+				logger.info(" Item with Item ID : " + itemID + " does not exist in User's borrowed List of books\n");
+				return "BookNotPresent : Item with Item ID : " + itemID
+						+ " does not exist in User's borrowed List of books.";
+			}
+		} else {
+			logger.info("User with User ID : " + userID + " does not exist\n");
+			return "User with User ID : " + userID + " does not exist.";
+		}
 
 	}
 
 	private static synchronized void setLibraryDetails() {
-		mcgBooks.put("MCG1234", "COMPUTER SCIENCE,9");
-		mcgBooks.put("MCG2225", "SOCIAL SCIENCE,4");
+
+		Books.put("MCG0956", "Complier Design,2");
+		Books.put("MCG4592", "JAVA and J2EE,5");
+
+		HashMap<String, Integer> temp = new HashMap<String, Integer>();
+		temp.put("MCG0956", 12);
+		temp.put("MCG4592", 23);
+		temp.put("MON0987", 18);
+		temp.put("CON2565", 10);
+
+		userlist = new HashMap<String, HashMap<String, Integer>>();
+		userlist.put("MCGU4747", temp);
+		HashMap<String, Integer> temp1 = new HashMap<String, Integer>();
+		temp.put("MCG4592", 23);
+		userlist.put("MCGU3263", temp1);
+
+		logger.info("Books registered while initialization\n");
+		Books.forEach((k, v) -> logger.info(("**  " + k + " " + v.split(",")[0] + " " + v.split(",")[1] + "\n")));
+		logger.info("User registered while initialization\n");
+		userlist.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
+
+		logger.info("Books WaitList registered while initialization\n");
+		if (waitlistBook != null)
+			waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
+		else
+			logger.info("NO Records");
+
 	}
 
 	public static String borrowBookToUser(String userID, String itemID, int numberOfDays) {
-		String message = "";
-		String Lib = itemID.substring(0, 3).toUpperCase();
-		switch (Lib) {
+
+		String lib = itemID.substring(0, 3).toUpperCase();
+		logger.info("->" + itemID + "," + userID);
+		switch (lib) {
 		case "MCG":
-			if (mcgBooks.containsKey(itemID)) {
-				int quantity = Integer.parseInt(mcgBooks.get(itemID).split(",")[1]);
-				System.out.println("Quantity is" + quantity);
+			if (Books.containsKey(itemID)) {
+				int quantity = Integer.parseInt(Books.get(itemID).split(",")[1]);
+				logger.info("@");
+				logger.info("-->" + Books.get(itemID).split(",")[1]);
 				if (quantity > 0) {
-					if (userID.substring(0, 3).equalsIgnoreCase("MCG")) {
-						setUserDetails(userID, itemID, numberOfDays);
-					} else {
-						message = "";
+					logger.info("Books in MCGill Library before user request " + Books);
+					if (userID.contains("MCG")) {
+						message = setUserDetails(userID, itemID, numberOfDays);
+						logger.info(userID + "User borrowed book details after borrowing MCGill library book "
+								+ userlist.get(userID));
 					}
-					quantity--;
-					System.out.println("Quantity after reduction" + quantity + "\n");
-					System.out.println("Books in McGill Library before user request" + mcgBooks.get(itemID) + "\n");
-					mcgBooks.put(itemID, mcgBooks.get(itemID).split(",")[0] + "," + quantity);
-					message = "pass";
-					System.out.println("Concordia User borrow list" + mcgUserList + "\n");
-					System.out.println("Books in McGill Library after user request" + mcgBooks + "\n");
+					if (message.contains("Successfully")) {
+						quantity--;
+						Books.put(itemID, Books.get(itemID).split(",")[0] + "," + quantity);
+					}
+
+					logger.info("Books in MCGill Library after user request" + Books);
 				} else {
-					message = "unavailable";
+					message = "Unavailable :  Book requested is currently not available";
 				}
 			} else {
-				message = "invalid";
+				message = "InvalidBook : Book ID Provided is Invalid";
+			}
+			break;
+
+		case "MON":
+
+			if (isUserAllowedInterLibraryBorrow(lib, userID)) {
+				logger.info("User is allowed to burrow requested book from Montreal Library");
+				logger.info("***********************************************");
+
+				if (message.contains("Successfully")) {
+					sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays + "," + message;
+					sendMessage(2222);
+					message = dataReceived;
+					if (message.contains("Successfully")) {
+						message = setUserDetails(userID, itemID, numberOfDays);
+						logger.info(userID + "User borrowed book details after borrowing Montreal library book "
+								+ userlist.get(userID));
+					}
+
+				}
+			} else {
+				message = "User has already borrowed one Montreal Library book";
 			}
 			break;
 
 		case "CON":
-			if (ActionServiceImpl.isUserAllowedInterLibraryBorrow("CON", mcgUserList)) {
-				sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays;
-				sendMessage(1111);
-				if (dataReceived.equalsIgnoreCase("pass")) {
-					setUserDetails(userID, itemID, numberOfDays);
-					message = "pass";
-					System.out.println(mcgUserList + " after concordia lib operation" + "\n");
-				} else if (dataReceived.equalsIgnoreCase("unavailable")) {
-					message = "unavailable";
-				} else if (dataReceived.equalsIgnoreCase("failed")) {
-					message = "invalid";
+			if (isUserAllowedInterLibraryBorrow(lib, userID)) {
+				logger.info("User is allowed to burrow requested book from Concordia");
+				logger.info("***********************************************");
+
+				if (message.contains("Successfully")) {
+					sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays + "," + message;
+					sendMessage(1111);
+					message = dataReceived;
+					if (message.contains("Successfully")) {
+						message = setUserDetails(userID, itemID, numberOfDays);
+						logger.info(userID + "User borrowed book details after borrowing Concordia library book "
+								+ userlist.get(userID));
+					}
+
 				}
 			} else {
-				message = "User has already borrowed Concordia Library book";
-			}
-			break;
-		case "MON":
-			if (ActionServiceImpl.isUserAllowedInterLibraryBorrow("MON", mcgUserList)) {
-				sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays;
-				sendMessage(2222);
-				if (dataReceived.equalsIgnoreCase("pass")) {
-					setUserDetails(userID, itemID, numberOfDays);
-					message = "pass";
-					System.out.println(mcgUserList + " after Montreal lib operation" + "\n");
-				} else if (dataReceived.equalsIgnoreCase("unavailable")) {
-					message = "unavailable";
-				} else if (dataReceived.equalsIgnoreCase("failed")) {
-					message = "invalid";
-				}
-			} else {
-				message = "User has already borrowed Montreal Library book";
+				message = "User has already borrowed one Concordia Library book";
 			}
 			break;
 		}
@@ -238,24 +368,25 @@ public class McGill extends UnicastRemoteObject {
 		return message;
 	}
 
-	public static String addUserToWaitlist(String userID, String itemID) {
+	public static String addUserToWaitlist(String userID, String itemID, int numberOfDays) {
 		String library = itemID.substring(0, 3).toUpperCase();
 		switch (library) {
 		case "MCG":
-			waitMcgUserList.add(userID);
-			waitMcgBook.put(itemID, waitMcgUserList);
-			message = "Added user to McGill wait list";
-			System.out.println("Wait list of McGill : " + waitMcgBook + "\n");
+			waitUserList.put(userID, numberOfDays);
+			waitlistBook.put(itemID, waitUserList);
+			message = "Added user " + userID + " to " + itemID + " waitlist Successfully !!";
+			logger.info("Wait list of Concordia Book List : ");
+			waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
 			break;
 
 		case "CON":
-			sendRequestMessage = "WAIT" + "," + userID + "," + itemID;
+			sendRequestMessage = "WAIT" + "," + userID + "," + itemID + "," + numberOfDays;
 			sendMessage(1111);
 			message = dataReceived;
 			System.out.println(message);
 			break;
 		case "MON":
-			sendRequestMessage = "WAIT" + "," + userID + "," + itemID;
+			sendRequestMessage = "WAIT" + "," + userID + "," + itemID + "," + numberOfDays;
 			sendMessage(2222);
 			message = dataReceived;
 			System.out.println(message);
@@ -264,8 +395,172 @@ public class McGill extends UnicastRemoteObject {
 		return message;
 	}
 
-	private static synchronized void setWaitingQueueDetails() {
+	public static String returnBookFromUser(String userID, String itemID) {
 
+		String lib = itemID.substring(0, 3).toUpperCase();
+		switch (lib) {
+		case "MCG":
+			if (Books.containsKey(itemID)) {
+				logger.info("Returning Book at MCGill Library\n");
+				int quantity = Integer.parseInt(Books.get(itemID).split(",")[1]);
+				logger.info("Books in MCGill Library before user request:\n" + Books);
+				if (userID.contains("MCG")) {
+					message = updateUserBookDetails(userID, itemID);
+				}
+				if (message.contains("Successfully")) {
+					quantity++;
+					Books.put(itemID, Books.get(itemID).split(",")[0] + "," + quantity);
+					if (waitlistBook.containsKey(itemID)) {
+						logger.info(" Fetching available users from returned book (" + itemID + ") waitlist");
+						logger.info(" Wait List of Books in MCGill Library After user request:\n" + waitlistBook);
+						HashMap<String, Integer> ulist = (HashMap<String, Integer>) waitlistBook.get(itemID);
+						if (!ulist.isEmpty()) {
+
+							String uID = ulist.keySet().toArray()[0].toString();
+							int numberOfDays = ulist.get(uID);
+							ulist.remove(uID);
+							waitlistBook.put(itemID, ulist);
+							logger.info(" User removed from the waitlist\n ");
+							logger.info(" Wait List of Books in MCGill Library After user request:\n" + waitlistBook);
+							message = "Borrow," + uID + "," + numberOfDays;
+						}
+					}
+
+				}
+
+				logger.info(" MCGill User borrow list:\n" + userlist);
+				logger.info(" Books in MCGill Library after user request:\n" + Books);
+
+			} else {
+				message = "InvalidBook : Book Id is Invalid.";
+			}
+			break;
+
+		case "CON":
+
+			System.out.println("***********************************************");
+			sendRequestMessage = "RETURN" + "," + userID + "," + itemID;
+			message = updateUserBookDetails(userID, itemID);
+			if (message.contains("Successfully")) {
+				sendRequestMessage = "RETURN" + "," + userID + "," + itemID + "," + message;
+				sendMessage(1111);
+				message = dataReceived;
+				if (dataReceived.equalsIgnoreCase("pass")) {
+					message = dataReceived;
+					logger.info(userlist + " after returning Concordia library Book");
+				}
+			}
+			break;
+
+		case "MON":
+			System.out.println("***********************************************");
+			sendRequestMessage = "RETURN" + "," + userID + "," + itemID;
+			message = updateUserBookDetails(userID, itemID);
+			if (message.contains("Successfully")) {
+				sendRequestMessage = "RETURN" + "," + userID + "," + itemID + "," + message;
+				sendMessage(2222);
+				message = dataReceived;
+				if (dataReceived.equalsIgnoreCase("pass")) {
+					message = dataReceived;
+					logger.info(userlist + " after returning Montreal library Book");
+				}
+			}
+			break;
+		}
+
+		return message;
+	}
+
+	public static String findItem(String UserId, String itemName) {
+		String display = "";
+		display = fetchonItemName(Concordia.Books, itemName);
+		logger.info("***********************************************");
+		sendRequestMessage = "FIND" + "," + itemName;
+		sendMessage(2222);
+		display = display.concat(dataReceived);
+		logger.info("***********************************************");
+		sendRequestMessage = "FIND" + "," + itemName;
+		sendMessage(2222);
+		display = display.concat(dataReceived);
+
+		return display;
+
+	}
+
+	public static String fetchonItemName(HashMap<String, String> books, String itemName) {
+		String result = "";
+		logger.info("Fetching " + itemName + " details from MCGill Library");
+		for (Map.Entry<String, String> entry : books.entrySet()) {
+			String key = entry.getKey();
+			String value = entry.getValue();
+			if (value.split(",")[0].trim().equalsIgnoreCase(itemName)) {
+				result = result.concat(key + "-" + value + "'");
+			}
+		}
+		logger.info(itemName + " details available in MCGill Library:" + result);
+
+		return result;
+	}
+
+	public static String removeItemFromLibrary(String itemID, int quantity) {
+
+		String[] itemInfo;
+		String operation = "";
+		if (Books.containsKey(itemID)) {
+			HashMap<String, String> conBooks = Books;
+			itemInfo = conBooks.get(itemID).split(",");
+			int oldquantity = Integer.parseInt(itemInfo[1]);
+			String itemName = itemInfo[0];
+			if (oldquantity >= quantity) {
+				int newQuantity = oldquantity - quantity;
+				if (quantity != -1) {
+					String keyValue = itemName + "," + newQuantity;
+					conBooks.put(itemID, keyValue);
+					operation = "Book's quantity decreased by" + quantity + " Successfully  from the avaialable list! ";
+					logger.info("After removal" + Books.toString());
+				} else if (quantity == -1) {
+					Books.remove(itemID);
+					removeItemFromuserlist(itemID);
+					logger.info("***********************************************");
+					sendRequestMessage = "REMOVE" + "," + itemID;
+					sendMessage(2222);
+					logger.info("***********************************************");
+					sendRequestMessage = "REMOVE" + "," + itemID;
+					sendMessage(3333);
+
+					operation = "Book removed Successfully and Borrowed List of available User's if aplicable!";
+				}
+
+			}
+
+			else if (oldquantity < quantity) {
+				operation = "Invalid Quantity , Please enter a valid Quantity to be deleted";
+				logger.info("Invalid Quantity , Please enter a valid Quantity to be deleted ");
+			}
+		} else {
+			operation = "Invalid Book : Book is not available in Library";
+		}
+		return operation;
+	}
+
+	private static void removeItemFromuserlist(String itemId) {
+		logger.info("Before Removal of Item Id from library, McGill userList:" + userlist.toString());
+		logger.info("Before Removal of Item Id from library, McGill waitList:" + waitlistBook.toString());
+		Iterator<Entry<String, HashMap<String, Integer>>> coIterator = userlist.entrySet().iterator();
+		while (coIterator.hasNext()) {
+			Entry<String, HashMap<String, Integer>> pair = coIterator.next();
+			HashMap<String, Integer> bookChecklist = (HashMap<String, Integer>) pair.getValue();
+			if (bookChecklist.containsKey(itemId)) {
+				bookChecklist.remove(itemId);
+				userlist.put(pair.getKey(), bookChecklist);
+				if (waitlistBook.containsKey(itemId)) {
+					waitlistBook.remove(itemId);
+				}
+
+			}
+		}
+		logger.info("After Removal of Item Id from library, McGill userList:" + userlist.toString());
+		logger.info("After Removal of Item Id from library, McGill waitList:" + waitlistBook.toString());
 	}
 
 }

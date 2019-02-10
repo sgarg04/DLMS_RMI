@@ -1,0 +1,29 @@
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.McGill startMcGillServer
+INFO: McGill registry created.
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.McGill startMcGillServer
+INFO: McGill Server bound in registry 
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.McGill startMcGillServer
+INFO: Setting Library Details 
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.McGill setLibraryDetails
+INFO: Books registered while initialization
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.McGill lambda$1
+INFO: **  MCG0956 Complier Design 2
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.McGill lambda$1
+INFO: **  MCG4592 JAVA and J2EE 5
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.McGill setLibraryDetails
+INFO: User registered while initialization
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.McGill lambda$2
+INFO: **  MCGU4747 {MON0987=18, CON2565=10, MCG0956=12, MCG4592=23}
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.McGill lambda$2
+INFO: **  MCGU3263 {}
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.McGill setLibraryDetails
+INFO: Books WaitList registered while initialization
+

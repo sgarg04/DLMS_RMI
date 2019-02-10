@@ -2,117 +2,81 @@ package com.rmi.common.action;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import com.rmi.common.User;
 import com.rmi.libraries.Concordia;
 import com.rmi.libraries.McGill;
 import com.rmi.libraries.Montreal;
 
 public class ActionServiceImpl extends UnicastRemoteObject implements ActionService {
 
-	String operation = "";
-	static boolean isUserAllowed;
-	static int count = 0;
-	HashMap<String, String> fetchBook = new HashMap<String, String>();
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private String operation = "";
+	private int oldQuantity;
+	
 
 	public ActionServiceImpl() throws RemoteException {
 		super();
 	}
 
-	public static boolean isUserAllowedInterLibraryBorrow(String library, ArrayList<User> userList) {
-		System.out.println(library);
-		System.out.println();
-		System.out.println(userList);
-		count = 0;
-		if (!userList.isEmpty()) {
-			userList.forEach((user) -> {
-				for (Map.Entry<String, Integer> entry : user.getBookInfo().entrySet()) {
-					String key = entry.getKey();
-					System.out.println(key + "\n");
-					if (key.substring(0, 3).equalsIgnoreCase(library)) {
-						count++;
-					}
-				}
-				System.out.println(count + "count");
-				System.out.println("value of boolean " + isUserAllowed);
-			});
-			
-			isUserAllowed = count == 1 ? false : true;
-//			System.out.println("count outside for" +count);
-//			System.out.println();
-//			System.out.println("isUserAllowedInterLibraryBorrrrrrow " + isUserAllowed);
-		}
-
-		else {
-			isUserAllowed = true;
-		}
-		return isUserAllowed;
-	}
-
 	@Override
 	public String addItem(String managerID, String itemID, String itemName, int quantity) throws RemoteException {
 		itemID = itemID.toUpperCase();
-		itemName = itemName.toUpperCase();
+		operation = "";
 		switch (managerID.substring(0, 3)) {
 		case "CON":
-			if (Concordia.conBooks.containsKey(itemID)) {
-				if (Concordia.conBooks.get(itemID).split(",")[0].equals(itemName)) {
-					int oldQuantity = Integer.parseInt(Concordia.conBooks.get(itemID).split(",")[1]);
+			if (Concordia.Books.containsKey(itemID)) {
+				if (Concordia.Books.get(itemID).split(",")[0].equalsIgnoreCase(itemName)) {
+					oldQuantity = Integer.parseInt(Concordia.Books.get(itemID).split(",")[1]);
 					quantity = oldQuantity + quantity;
-					Concordia.conBooks.put(itemID, itemName + "," + quantity);
-					System.out.println(Concordia.conBooks);
-					operation = "Item " + itemID + " exists, hence increased item's quantity";
-
+					Concordia.Books.put(itemID, itemName + "," + quantity);
+					operation = "Item " + itemID + " exists, hence increased item's quantity by " + quantity
+							+ " Successfully";
 				} else {
-					operation = "A book already exists with item ID" + itemID;
+					operation = "A book already exists with item ID: " + itemID + " with a Different Name";
 				}
 			} else {
-				Concordia.conBooks.put(itemID, itemName + "," + quantity);
-				System.out.println(Concordia.conBooks);
-				operation = "Item " + itemID + " added to the library";
+				Concordia.Books.put(itemID, itemName + "," + quantity);
+				operation = "Item " + itemID + " added to the library Successfully";
 			}
+			System.out.println(Concordia.Books);
 			break;
-		case "MON":
-			if (Montreal.monBooks.containsKey(itemID)) {
-				if (Montreal.monBooks.get(itemID).split(",")[0].equals(itemName)) {
-					int oldQuantity = Integer.parseInt(Montreal.monBooks.get(itemID).split(",")[1]);
-					quantity = oldQuantity + quantity;
-					Montreal.monBooks.put(itemID, itemName + "," + quantity);
-					System.out.println(Montreal.monBooks);
-					operation = "Item " + itemID + " exists, hence increased item's quantity";
 
+		case "MON":
+			if (Montreal.Books.containsKey(itemID)) {
+				if (Montreal.Books.get(itemID).split(",")[0].equalsIgnoreCase(itemName)) {
+					oldQuantity = Integer.parseInt(Montreal.Books.get(itemID).split(",")[1]);
+					quantity = oldQuantity + quantity;
+					Montreal.Books.put(itemID, itemName + "," + quantity);
+					operation = "Item " + itemID + " exists, hence increased item's quantity";
 				} else {
-					operation = "A book already exists with item ID" + itemID;
+					operation = "A book already exists with item ID: " + itemID + " with a Different Name";
 				}
 			} else {
-				Montreal.monBooks.put(itemID, itemName + "," + quantity);
-				System.out.println(Montreal.monBooks);
+				Montreal.Books.put(itemID, itemName + "," + quantity);
+				Montreal.waitlistBook.put(itemID, new HashMap<String,Integer>());
 				operation = "Item " + itemID + " added to the library";
 			}
+			System.out.println(Montreal.Books);
 			break;
 
 		case "MCG":
-			if (McGill.mcgBooks.containsKey(itemID)) {
-				if (McGill.mcgBooks.get(itemID).split(",")[0].equals(itemName)) {
-					int oldQuantity = Integer.parseInt(McGill.mcgBooks.get(itemID).split(",")[1]);
+			if (McGill.Books.containsKey(itemID)) {
+				if (McGill.Books.get(itemID).split(",")[0].equalsIgnoreCase(itemName)) {
+					oldQuantity = Integer.parseInt(McGill.Books.get(itemID).split(",")[1]);
 					quantity = oldQuantity + quantity;
-					McGill.mcgBooks.put(itemID, itemName + "," + quantity);
-					System.out.println(McGill.mcgBooks);
+					McGill.Books.put(itemID, itemName + "," + quantity);
+					System.out.println(McGill.Books);
 					operation = "Item " + itemID + " exists, hence increased item's quantity";
 
 				} else {
-					operation = "A book already exists with item ID" + itemID;
+					operation = "A book already exists with item ID: " + itemID + " with a Different Name";
 				}
 			} else {
-				McGill.mcgBooks.put(itemID, itemName + "," + quantity);
-				System.out.println(McGill.mcgBooks);
+				McGill.Books.put(itemID, itemName + "," + quantity);
+				McGill.waitlistBook.put(itemID, new HashMap<String,Integer>());
 				operation = "Item " + itemID + " added to the library";
 			}
 			break;
@@ -123,68 +87,22 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 	@Override
 	public String removeItem(String managerID, String itemID, int quantity) {
 		itemID = itemID.toUpperCase();
-		System.out.println(Concordia.conBooks);
 		switch (managerID.substring(0, 3)) {
 		case "CON":
-			HashMap<String, String> conBooks = Concordia.conBooks;
-			if (quantity == -1) {
-				conBooks.remove(itemID);
-				operation = "Item removed!";
-			} else {
-				String[] itemInfo = conBooks.get(itemID).split(",");
-				if (Integer.parseInt(itemInfo[1]) > quantity) {
-					quantity = Integer.parseInt(itemInfo[1]) - quantity;
-					String keyValue = itemInfo[0] + "," + quantity;
-					conBooks.put(itemID, keyValue);
-					operation = "Item's quantity decreased!";
-					System.out.println(Concordia.conBooks);
-				} else {
-					operation = "Item's quantity avaiable is less than or equal to the value asked to remove!";
-				}
-
-			}
+			operation=Concordia.removeItemFromLibrary(itemID, quantity);
 			break;
+			
 		case "MON":
-			HashMap<String, String> monBooks = Montreal.monBooks;
-			if (quantity == -1) {
-				monBooks.remove(itemID);
-				operation = "Item removed!";
-			} else {
-				String[] itemInfo = monBooks.get(itemID).split(",");
-				if (Integer.parseInt(itemInfo[1]) > quantity) {
-					quantity = Integer.parseInt(itemInfo[1]) - quantity;
-					String keyValue = itemInfo[0] + "," + quantity;
-					monBooks.put(itemID, keyValue);
-					operation = "Item's quantity decreased!";
-				} else {
-					operation = "Item's quantity avaiable is less than or equal to the value asked to remove!";
-				}
-
-			}
+			operation=Montreal.removeItemFromLibrary(itemID, quantity);
 			break;
 
 		case "MCG":
-			HashMap<String, String> mcgBooks = McGill.mcgBooks;
-
-			if (quantity == -1) {
-				mcgBooks.remove(itemID);
-				operation = "Item removed!";
-			} else {
-				String[] itemInfo = mcgBooks.get(itemID).split(",");
-				if (Integer.parseInt(itemInfo[1]) > quantity) {
-					quantity = Integer.parseInt(itemInfo[1]) - quantity;
-					String keyValue = itemInfo[0] + "," + quantity;
-					mcgBooks.put(itemID, keyValue);
-					operation = "Item's quantity decreased!";
-				} else {
-					operation = "Item's quantity avaiable is less than or equal to the value asked to remove!";
-				}
-
-			}
+			operation=McGill.removeItemFromLibrary(itemID, quantity);
 			break;
 		}
 		return operation;
 	}
+	
 
 	@Override
 	public HashMap<String, String> listItemAvailability(String managerID) {
@@ -193,16 +111,16 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 
 		switch (managerID.substring(0, 3)) {
 		case "CON":
-			System.out.println(Concordia.conBooks);
-			bookList = Concordia.conBooks;
+			System.out.println(Concordia.Books);
+			bookList = Concordia.Books;
 			break;
 		case "MON":
-			System.out.println(Montreal.monBooks);
-			bookList = Montreal.monBooks;
+			System.out.println(Montreal.Books);
+			bookList = Montreal.Books;
 			break;
 		case "MCG":
-			System.out.println(McGill.mcgBooks);
-			bookList = McGill.mcgBooks;
+			System.out.println(McGill.Books);
+			bookList = McGill.Books;
 			break;
 		}
 		return bookList;
@@ -210,77 +128,111 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 
 	@Override
 	public String borrowItem(String userID, String itemID, int numberOfDays) {
-
+		operation = "";
 		itemID = itemID.toUpperCase();
-		if (userID.substring(0, 3).equals("CON")) {
+		System.out.println(userID+","+itemID);
+		switch (userID.substring(0, 3)) {
+		case "CON":
 			operation = Concordia.borrowBookToUser(userID, itemID, numberOfDays);
-		} else if (userID.substring(0, 3).equals("MON")) {
+			break;
+		case "MON":
 			operation = Montreal.borrowBookToUser(userID, itemID, numberOfDays);
-		}
-		if (userID.substring(0, 3).equals("MCG")) {
+			break;
+		case "MCG":
 			operation = McGill.borrowBookToUser(userID, itemID, numberOfDays);
+			break;
 		}
 		return operation;
 	}
+	
 
 	@Override
-	public String waitList(String userID, String itemID) throws RemoteException {
+	public String waitList(String userID, String itemID, int numberOfdays) throws RemoteException {
+		operation = "";
 		itemID = itemID.toUpperCase();
-		if (userID.substring(0, 3).equals("CON")) {
-			operation = Concordia.addUserToWaitlist(userID, itemID);
-		} else if (userID.substring(0, 3).equals("MON")) {
-			operation = Montreal.addUserToWaitlist(userID, itemID);
-		}
-		if (userID.substring(0, 3).equals("MCG")) {
-			operation = McGill.addUserToWaitlist(userID, itemID);
+		switch (userID.substring(0, 3)) {
+		case "CON":
+			operation = Concordia.addUserToWaitlist(userID, itemID, numberOfdays);
+			break;
+		case "MON":
+			operation = Montreal.addUserToWaitlist(userID, itemID, numberOfdays);
+			break;
+		case "MCG":
+			operation = McGill.addUserToWaitlist(userID, itemID, numberOfdays);
+			break;
 		}
 		return operation;
 	}
-
+	
 	@Override
-	public HashMap<String, String> findItem(String userId, String itemName) {
-		HashMap<String, String> displayBooks = new HashMap<String, String>();
-		for (Map.Entry<String, String> entry : Concordia.conBooks.entrySet()) {
-			String key = entry.getKey();
-			String value = entry.getValue();
-			if (value.split(",")[0].trim().equalsIgnoreCase(itemName)) {
-				displayBooks.put(key, value);
-			}
+	public String findItem(String userId, String itemName) {
+		String booklist = new String();
+
+		switch (userId.substring(0, 3)) {
+		case "CON":
+			booklist = Concordia.findItem(userId, itemName);
+			break;
+		case "MON":
+			booklist = Montreal.findItem(userId, itemName);
+			break;
+		case "MCG":
+			booklist = McGill.findItem(userId, itemName);
+			break;
 		}
-		for (Map.Entry<String, String> entry : Montreal.monBooks.entrySet()) {
-			String key = entry.getKey();
-			String value = entry.getValue();
-			if (value.split(",")[0].trim().equalsIgnoreCase(itemName)) {
-				displayBooks.put(key, value);
-			}
+		if (!booklist.equals("")) {
+			int length = booklist.length();
+			booklist.substring(0, length - 1);
+			System.out.println("booklist here");
+			System.out.println(booklist);
 		}
-		for (Map.Entry<String, String> entry : McGill.mcgBooks.entrySet()) {
-			String key = entry.getKey();
-			String value = entry.getValue();
-			if (value.split(",")[0].trim().equalsIgnoreCase(itemName)) {
-				displayBooks.put(key, value);
-			}
-		}
-		return displayBooks;
+		return booklist;
+
 	}
 
 	@Override
 	public String returnItem(String userID, String itemID) {
+		operation = "";
 		itemID = itemID.toUpperCase();
 		switch (userID.substring(0, 3)) {
 		case "CON":
-			if (Concordia.conUserList.contains(userID) && Concordia.conUserList.contains(itemID)) {
-				Concordia.conBooks.remove(itemID);
-				System.out.println(Concordia.conUserList + "33");
+			operation = Concordia.returnBookFromUser(userID, itemID);
+
+			if (operation.contains("Borrow")) {
+				String uId = operation.split(",")[1];
+				int numberOfDay = Integer.parseInt(operation.split(",")[2]);
+				borrowItem(uId, itemID, numberOfDay);
+				operation = itemID + " returned successfully to the Library by " + userID + " "
+						+ " and removed from user borrowed list. Assigned to " + uId + " user, waiting in the WaitList";
 			}
 			break;
+
 		case "MON":
+			operation = Montreal.returnBookFromUser(userID, itemID);
+
+			if (operation.contains("Borrow")) {
+				String uId = operation.split(",")[1];
+				int numberOfDay = Integer.parseInt(operation.split(",")[2]);
+				borrowItem(uId, itemID, numberOfDay);
+				operation = itemID + " returned successfully to the Library by " + userID + " "
+						+ " and removed from user borrowed list. Assigned to " + uId + " user, waiting in the WaitList";
+
+			}
 			break;
+
 		case "MCG":
+			operation = McGill.returnBookFromUser(userID, itemID);
+
+			if (operation.contains("Borrow")) {
+				String uId = operation.split(",")[1];
+				int numberOfDay = Integer.parseInt(operation.split(",")[2]);
+				borrowItem(uId, itemID, numberOfDay);
+				operation = itemID + " returned successfully to the Library by " + userID + " "
+						+ " and removed from user borrowed list. Assigned to " + uId + " user, waiting in the WaitList";
+			}
 			break;
 		}
 
-		return null;
+		return operation;
 	}
 
 }

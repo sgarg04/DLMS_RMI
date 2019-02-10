@@ -1,0 +1,30 @@
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia startConcordiaServer
+INFO: Concordia registry created.
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia startConcordiaServer
+INFO: Concordia Server bound in registry
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia startConcordiaServer
+INFO: ** Setting Library Details **
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia setLibraryDetails
+INFO:  ** Books registered while initialization
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia lambda$1
+INFO: **  CON7878 Complier Design 4
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia lambda$1
+INFO: **  CON2565 Discrete Mathmatical Structure 0
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia setLibraryDetails
+INFO:  ** User registered while initialization
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia lambda$2
+INFO: **  CONU4774 {}
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia lambda$2
+INFO: **  CONU1234 {CON7878=12, CON2565=23, MCG4592=18}
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia setLibraryDetails
+INFO:  ** Books WaitList registered while initialization
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia lambda$3
+INFO: **  CON2565 {MONU7474=17}
+

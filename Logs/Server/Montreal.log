@@ -1,0 +1,33 @@
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Montreal startMontrealServer
+INFO: Montreal registry created.
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Montreal startMontrealServer
+INFO: Montreal Server bound in registry 
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Montreal startMontrealServer
+INFO: Setting Library Details 
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Montreal setLibraryDetails
+INFO: Books registered while initialization
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Montreal lambda$1
+INFO: **  MON0987 Computer Organization 1
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Montreal lambda$1
+INFO: **  MON1234 Computer Networks 9
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Montreal lambda$1
+INFO: **  MON2225 Discrete Mathmatical Structure 1
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Montreal setLibraryDetails
+INFO: User registered while initialization
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Montreal lambda$2
+INFO: **  MONU7474 {MON1234=12, MON2225=23}
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Montreal lambda$2
+INFO: **  MONU1622 {CON7878=18, MON2225=2}
+
+Feb 10, 2019 1:41:18 AM com.rmi.libraries.Montreal setLibraryDetails
+INFO: Books WaitList registered while initialization
+
