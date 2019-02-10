@@ -1,0 +1,11 @@
+Feb 10, 2019 2:22:15 AM com.rmi.client.Client userOperation
+INFO: User with user id CONU2233opted to find a book
+Feb 10, 2019 2:22:22 AM com.rmi.client.Client userOperation
+INFO: User with user id CONU2233opted to find a book with name as Computer Science
+Feb 10, 2019 2:22:22 AM com.rmi.client.Client userOperation
+INFO: ***** Entering findItem operation ****
+Feb 10, 2019 2:22:22 AM com.rmi.client.Client userOperation
+INFO: Response received from server : 
+Feb 10, 2019 2:22:22 AM com.rmi.client.Client userOperation
+SEVERE: 
+No book available with the entered name
