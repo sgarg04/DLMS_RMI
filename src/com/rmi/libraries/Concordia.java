@@ -178,7 +178,35 @@ public class Concordia {
 		}
 	}
 
-	private static boolean isUserAllowedInterLibraryBorrow(String library, String userID) {
+	public static boolean isUserInWaitlistForSameItemID(String userID) {
+		boolean isUserInWaitList = false;
+		HashMap<String, Integer> waitUserInfo;
+		int count;
+		if (!waitlistBook.isEmpty()) {
+			System.out.println("waitlistBook" + waitlistBook);
+			count = 0;
+			Iterator<Entry<String, HashMap<String, Integer>>> waitListIterator = waitlistBook.entrySet().iterator();
+			while (waitListIterator.hasNext()) {
+				count = 0;
+				Entry<String, HashMap<String, Integer>> thisEntry = waitListIterator.next();
+				waitUserInfo = thisEntry.getValue();
+				System.out.println("waitUserInfo " + waitUserInfo);
+				if (waitUserInfo.containsKey(userID)) {
+					count++;
+					System.out.println("waitUserInfo : " + waitUserInfo + "userID : " + userID);
+					System.out.println("count :" + count);
+				}
+			}
+			isUserInWaitList = count == 1 ? true : false;
+		} else {
+			isUserInWaitList = false;
+
+		}
+		System.out.println("isUserWaitListValid" + isUserInWaitList);
+		return isUserInWaitList;
+	}
+
+	public static boolean isUserAllowedInterLibraryBorrow(String library, String userID) {
 
 		String key;
 		HashMap<String, Integer> userinfo;
@@ -204,29 +232,44 @@ public class Concordia {
 		return isUserAllowed;
 	}
 
+//	private static boolean isUserAllowedInterLibraryBorrow(String library, String userID, String itemID) {
+//		logger.info("Checking User Info for accessibilty for requested book");
+//		boolean isUserAllowed = false;
+//		
+//
+//		isUserAllowed = (isUserListValid && isUserWaitListValid) ? true : false;
+//
+//		if (isUserAllowed)
+//			message = "Successfully";
+//
+//		System.out.println("isUserAllowed " + isUserAllowed);
+//		return isUserAllowed;
+//	}
+
 	private static String setUserDetails(String userID, String itemID, int numberOfDays) {
 		HashMap<String, Integer> temp = new HashMap<String, Integer>();
-//		if (userlist.containsKey(userID)) {
-		temp = userlist.get(userID);
-		if (!temp.containsKey(itemID) || temp.isEmpty() || temp == null) {
-			temp.put(itemID, numberOfDays);
-			userlist.put(userID, temp);
-			logger.info("Item " + itemID + "Successfully Borrowed by User " + userID + ".Added to user borrowed List");
-			return "Item " + itemID + "Successfully Borrowed by User " + userID + ".Added to user borrowed List";
+		if (userlist.containsKey(userID)) {
+			temp = userlist.get(userID);
+			if (!temp.containsKey(itemID) || temp.isEmpty() || temp == null) {
+				temp.put(itemID, numberOfDays);
+				userlist.put(userID, temp);
+				logger.info("Book with book id " + itemID + " successfully borrowed by user " + userID
+						+ ". Also, added the book to user's borrowed list");
+				return "Book with book id " + itemID + " successfully borrowed by user " + userID
+						+ ". Also, added the book to user's borrowed list";
+
+			} else {
+				System.err.println("Item already available in user's burrowed list");
+				logger.info("Item already available in user's burrowed list");
+				return "Requested book already exists in user's borrowed list. Cannot borrow the same item again";
+			}
 
 		} else {
-			System.err.println("Item already available in user's burrowed list");
-			logger.info("Item already available in user's burrowed list");
-			return "Item already available in user's burrowed list,Can't Borrow Same Item Again.";
+			logger.info("User with User ID : " + userID + " does not exist\n");
+			return "User with User ID : " + userID + " does not exist.";
 		}
 
 	}
-//	else {
-//			logger.info("User with User ID : " + userID + " does not exist\n");
-//			return "User with User ID : " + userID + " does not exist.";
-//		}
-
-//	}
 
 	private static String updateUserBookDetails(String userID, String itemID) {
 		HashMap<String, Integer> temp = new HashMap<String, Integer>();
@@ -280,7 +323,6 @@ public class Concordia {
 	}
 
 	public static String borrowBookToUser(String userID, String itemID, int numberOfDays) {
-
 		String lib = itemID.substring(0, 3).toUpperCase();
 		switch (lib) {
 		case "CON":
@@ -309,9 +351,8 @@ public class Concordia {
 
 		case "MON":
 			if (isUserAllowedInterLibraryBorrow(lib, userID)) {
-				logger.info("User is allowed to burrow requested book");
+				logger.info("User is allowed to borrow requested book");
 				logger.info("***********************************************");
-
 				if (message.contains("Successfully")) {
 					sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays + "," + message;
 					sendMessage(2222);
@@ -330,7 +371,7 @@ public class Concordia {
 			break;
 		case "MCG":
 			if (isUserAllowedInterLibraryBorrow(lib, userID)) {
-				logger.info("User is allowed to burrow requested book");
+				logger.info("User is allowed to borrow requested book");
 				logger.info("***********************************************");
 
 				if (message.contains("Successfully")) {
@@ -354,14 +395,23 @@ public class Concordia {
 	}
 
 	public static String addUserToWaitlist(String userID, String itemID, int numberOfdays) {
+		HashMap<String, Integer> userInfo;
 		String library = itemID.substring(0, 3).toUpperCase();
 		switch (library) {
 		case "CON":
-			waitUserList.put(userID, numberOfdays);
-			waitlistBook.put(itemID, waitUserList);
-			message = "Added user " + userID + " to " + itemID + " waitlist Successfully !!";
-			logger.info("Wait list of Concordia Book List : ");
-			waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
+			if (waitlistBook.containsKey(itemID)) {
+				userInfo = waitlistBook.get(itemID);
+				if (userInfo.containsKey(userID)) {
+					message = "User " + userID + " already in waitlist of book with item ID " + itemID;
+					logger.info(message);
+				} else {
+					waitUserList.put(userID, numberOfdays);
+					waitlistBook.put(itemID, waitUserList);
+					message = "Added user " + userID + " to " + itemID + " waitlist Successfully !!";
+					logger.info("Wait list of Concordia Book List : ");
+					waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
+				}
+			}
 			break;
 
 		case "MON":
@@ -451,7 +501,6 @@ public class Concordia {
 			}
 			break;
 		}
-
 		return message;
 	}
 

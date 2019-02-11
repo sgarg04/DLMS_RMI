@@ -52,9 +52,10 @@ public class Montreal {
 		try {
 			try {
 				// This block configure the logger with handler and formatter
-				fileHandler = new FileHandler("/Users/SGarg/Shresthi/Winter 2019/DS-COMP 6231/assignment/DLMS_DS2019/DistributedLibraryManagementSystem/Logs/Server/Montreal.log");
+				fileHandler = new FileHandler(
+						"/Users/SGarg/Shresthi/Winter 2019/DS-COMP 6231/assignment/DLMS_DS2019/DistributedLibraryManagementSystem/Logs/Server/Montreal.log");
 				logger.addHandler(fileHandler);
-				
+
 				SimpleFormatter formatter = new SimpleFormatter();
 				fileHandler.setFormatter(formatter);
 			} catch (SecurityException e) {
@@ -113,7 +114,7 @@ public class Montreal {
 				aSocket.close();
 				fileHandler.close();
 			}
-				
+
 		}
 	}
 
@@ -203,32 +204,33 @@ public class Montreal {
 		} else {
 			isUserAllowed = true;
 		}
-		if (isUserAllowed)message="Successfully";
+		if (isUserAllowed)
+			message = "Successfully";
 		return isUserAllowed;
 	}
 
 	private static String setUserDetails(String userID, String itemID, int numberOfDays) {
 		HashMap<String, Integer> temp = new HashMap<String, Integer>();
-//		if (userlist.containsKey(userID)) {
+		if (userlist.containsKey(userID)) {
 			temp = userlist.get(userID);
 			if (!temp.containsKey(itemID) || temp.isEmpty() || temp == null) {
 				temp.put(itemID, numberOfDays);
 				userlist.put(userID, temp);
-				logger.info("Item "+itemID+ "Successfully Borrowed by User "+userID+".Added to user borrowed List");
-				return "Item "+itemID+ "Successfully Borrowed by User "+userID+".Added to user borrowed List";
+				logger.info(
+						"Item " + itemID + "Successfully Borrowed by User " + userID + ".Added to user borrowed List");
+				return "Item " + itemID + "Successfully Borrowed by User " + userID + ".Added to user borrowed List";
 			} else {
 				System.err.println("Item already available in user's burrowed list");
 				logger.info("Item already available in user's burrowed list");
 				return "Item already available in user's burrowed list,Can't Borrow Same Item Again.";
 			}
 
-		} 
-//	else {
-//			logger.info("User with User ID : " + userID + " does not exist\n");
-//			return "User with User ID : "+userID+ " does not exist.";
-//		}
-//
-//	}
+		} else {
+			logger.info("User with User ID : " + userID + " does not exist\n");
+			return "User with User ID : " + userID + " does not exist.";
+		}
+
+	}
 
 	private static String updateUserBookDetails(String userID, String itemID) {
 		HashMap<String, Integer> temp = new HashMap<String, Integer>();
@@ -240,13 +242,13 @@ public class Montreal {
 				logger.info(" Item returned Successfully to the Library and removed from user borrowed list.");
 				return "Item returned Successfully to the Library and removed from user borrowed list.";
 			} else {
-				logger.info(
-						" Item with Item ID : " + itemID + " does not exist in User's borrowed List of books\n");
-				return "BookNotPresent : Item with Item ID : " + itemID + " does not exist in User's borrowed List of books.";
+				logger.info(" Item with Item ID : " + itemID + " does not exist in User's borrowed List of books\n");
+				return "BookNotPresent : Item with Item ID : " + itemID
+						+ " does not exist in User's borrowed List of books.";
 			}
 		} else {
 			logger.info("User with User ID : " + userID + " does not exist\n");
-			return "User with User ID : "+userID+ " does not exist.";
+			return "User with User ID : " + userID + " does not exist.";
 		}
 
 	}
@@ -283,12 +285,11 @@ public class Montreal {
 	}
 
 	public static String borrowBookToUser(String userID, String itemID, int numberOfDays) {
-		
 		String lib = itemID.substring(0, 3).toUpperCase();
 		switch (lib) {
 		case "MON":
 			if (Books.containsKey(itemID)) {
-				
+
 				int quantity = Integer.parseInt(Books.get(itemID).split(",")[1]);
 				if (quantity > 0) {
 					logger.info("Books in Montreal Library before user request " + Books);
@@ -306,16 +307,14 @@ public class Montreal {
 				} else {
 					message = "Unavailable :  Book requested is currently not available";
 				}
-			} else {
-				message = "InvalidBook : Book ID Provided is Invalid";
 			}
 			break;
 
 		case "CON":
 			if (isUserAllowedInterLibraryBorrow(lib, userID)) {
-				logger.info("User is allowed to burrow requested book from Concordia");
+				logger.info("User is allowed to borrow requested book from Concordia");
 				logger.info("***********************************************");
-				
+
 				if (message.contains("Successfully")) {
 					sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays + "," + message;
 					sendMessage(1111);
@@ -334,9 +333,9 @@ public class Montreal {
 
 		case "MCG":
 			if (isUserAllowedInterLibraryBorrow(lib, userID)) {
-				logger.info("User is allowed to burrow requested book from MCGill");
+				logger.info("User is allowed to borrow requested book from MCGill");
 				logger.info("***********************************************");
-				
+
 				if (message.contains("Successfully")) {
 					sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays + "," + message;
 					sendMessage(3333);
@@ -358,14 +357,23 @@ public class Montreal {
 	}
 
 	public static String addUserToWaitlist(String userID, String itemID, int numberOfDays) {
+		HashMap<String, Integer> userInfo;
 		String library = itemID.substring(0, 3).toUpperCase();
 		switch (library) {
 		case "MON":
-			waitUserList.put(userID, numberOfDays);
-			waitlistBook.put(itemID, waitUserList);
-			message = "User Successfully added to Montreal waitlist";
-			logger.info("Wait list of Montreal Book List : ");
-			waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
+			if (waitlistBook.containsKey(itemID)) {
+				userInfo = waitlistBook.get(itemID);
+				if (userInfo.containsKey(userID)) {
+					message = "User " + userID + " already in waitlist of book with item ID " + itemID;
+					logger.info(message);
+				} else {
+					waitUserList.put(userID, numberOfDays);
+					waitlistBook.put(itemID, waitUserList);
+					message = "User Successfully added to Montreal waitlist";
+					logger.info("Wait list of Montreal Book List : ");
+					waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
+				}
+			}
 			break;
 
 		case "CON":
@@ -386,7 +394,6 @@ public class Montreal {
 	}
 
 	public static String returnBookFromUser(String userID, String itemID) {
-
 		String lib = itemID.substring(0, 3).toUpperCase();
 		switch (lib) {
 		case "MON":
@@ -490,30 +497,24 @@ public class Montreal {
 
 		return result;
 	}
-	
-public static String removeItemFromLibrary(String itemID, int quantity) {
-		
+
+	public static String removeItemFromLibrary(String itemID, int quantity) {
+
 		String[] itemInfo;
-		String operation ="";
-		if(Books.containsKey(itemID))
-		{
+		String operation = "";
+		if (Books.containsKey(itemID)) {
 			HashMap<String, String> conBooks = Books;
 			itemInfo = conBooks.get(itemID).split(",");
-			int oldquantity= Integer.parseInt(itemInfo[1]);
+			int oldquantity = Integer.parseInt(itemInfo[1]);
 			String itemName = itemInfo[0];
-			if(oldquantity >= quantity)
-			{
-				int newQuantity = oldquantity-quantity;
-				if(quantity!=-1)
-				{
+			if (oldquantity >= quantity) {
+				int newQuantity = oldquantity - quantity;
+				if (quantity != -1) {
 					String keyValue = itemName + "," + newQuantity;
 					Books.put(itemID, keyValue);
-					operation = "Book's quantity decreased by" + quantity
-							+ " Successfully  from the avaialable list! ";
-					logger.info("After removal"+ Books.toString());
-				}
-				else if(quantity==-1 )
-				{
+					operation = "Book's quantity decreased by" + quantity + " Successfully  from the avaialable list! ";
+					logger.info("After removal" + Books.toString());
+				} else if (quantity == -1) {
 					Books.remove(itemID);
 					removeItemFromuserlist(itemID);
 					logger.info("***********************************************");
@@ -522,12 +523,12 @@ public static String removeItemFromLibrary(String itemID, int quantity) {
 					logger.info("***********************************************");
 					sendRequestMessage = "REMOVE" + "," + itemID;
 					sendMessage(3333);
-					
+
 					operation = "Book removed Successfully and Borrowed List of available User's if aplicable!";
 				}
-	
+
 			}
-			
+
 			else if (oldquantity < quantity) {
 				operation = "Invalid Quantity , Please enter a valid Quantity to be deleted";
 				logger.info("Invalid Quantity , Please enter a valid Quantity to be deleted ");
@@ -537,27 +538,24 @@ public static String removeItemFromLibrary(String itemID, int quantity) {
 		}
 		return operation;
 	}
-	
-	private static void removeItemFromuserlist(String itemId)
-	{
-		logger.info("Before Removal of Item Id from library, Montreal userList:"+userlist.toString());
-		logger.info("Before Removal of Item Id from library, Montreal waitList:"+waitlistBook.toString());
-		Iterator<Entry<String, HashMap<String, Integer>>> Iterator =  userlist.entrySet().iterator();
+
+	private static void removeItemFromuserlist(String itemId) {
+		logger.info("Before Removal of Item Id from library, Montreal userList:" + userlist.toString());
+		logger.info("Before Removal of Item Id from library, Montreal waitList:" + waitlistBook.toString());
+		Iterator<Entry<String, HashMap<String, Integer>>> Iterator = userlist.entrySet().iterator();
 		while (Iterator.hasNext()) {
-			Entry<String, HashMap<String, Integer>> pair =Iterator.next();
+			Entry<String, HashMap<String, Integer>> pair = Iterator.next();
 			HashMap<String, Integer> bookChecklist = (HashMap<String, Integer>) pair.getValue();
-			if(bookChecklist.containsKey(itemId))
-			{
+			if (bookChecklist.containsKey(itemId)) {
 				bookChecklist.remove(itemId);
-				userlist.put(pair.getKey(),bookChecklist);
-				if(waitlistBook.containsKey(itemId))
-				{
+				userlist.put(pair.getKey(), bookChecklist);
+				if (waitlistBook.containsKey(itemId)) {
 					waitlistBook.remove(itemId);
 				}
-				
+
 			}
 		}
-		logger.info("After Removal of Item Id from library, Montreal userList:"+ userlist.toString());
-		logger.info("After Removal of Item Id from library, Montreal waitList:"+waitlistBook.toString());
+		logger.info("After Removal of Item Id from library, Montreal userList:" + userlist.toString());
+		logger.info("After Removal of Item Id from library, Montreal waitList:" + waitlistBook.toString());
 	}
 }

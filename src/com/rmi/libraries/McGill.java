@@ -195,20 +195,26 @@ public class McGill {
 		logger.info("Checking User Info for accessibilty for requested book");
 		Boolean isUserAllowed = false;
 		int count = 0;
-		userinfo = userlist.get(userID);
-		if (!userinfo.isEmpty()) {
-			Iterator<Entry<String, Integer>> iterator = userinfo.entrySet().iterator();
-			while (iterator.hasNext()) {
-				Entry<String, Integer> thisEntry = iterator.next();
-				key = thisEntry.getKey();
-				if (key.substring(0, 3).equalsIgnoreCase(library)) {
-					count++;
+		System.out.println("userID " + userID);
+		System.out.println("userlist " + userlist);
+		System.out.println("result " + userlist.containsKey(userID));
+		while (userlist.containsKey(userID)) {
+			userinfo = userlist.get(userID);
+			if (!userinfo.isEmpty()) {
+				Iterator<Entry<String, Integer>> iterator = userinfo.entrySet().iterator();
+				while (iterator.hasNext()) {
+					Entry<String, Integer> thisEntry = iterator.next();
+					key = thisEntry.getKey();
+					if (key.substring(0, 3).equalsIgnoreCase(library)) {
+						count++;
+					}
 				}
+
+				isUserAllowed = (count == 1 ? false : true);
+			} else {
+				isUserAllowed = true;
 			}
 
-			isUserAllowed = (count == 1 ? false : true);
-		} else {
-			isUserAllowed = true;
 		}
 		if (isUserAllowed)
 			message = "Successfully";
@@ -217,7 +223,7 @@ public class McGill {
 
 	private static String setUserDetails(String userID, String itemID, int numberOfDays) {
 		HashMap<String, Integer> temp = new HashMap<String, Integer>();
-//		if (userlist.containsKey(userID)) {
+		if (userlist.containsKey(userID)) {
 			temp = userlist.get(userID);
 			if (!temp.containsKey(itemID) || temp.isEmpty() || temp == null) {
 				temp.put(itemID, numberOfDays);
@@ -231,13 +237,12 @@ public class McGill {
 				return "Item already available in user's burrowed list,Can't Borrow Same Item Again.";
 			}
 
-		} 
-//	else {
-//			logger.info("User with User ID : " + userID + " does not exist\n");
-//			return "User with User ID : " + userID + " does not exist.";
-//		}
-//
-//	}
+		} else {
+			logger.info("User with User ID : " + userID + " does not exist\n");
+			return "User with User ID : " + userID + " does not exist.";
+		}
+
+	}
 
 	private static String updateUserBookDetails(String userID, String itemID) {
 		HashMap<String, Integer> temp = new HashMap<String, Integer>();
@@ -291,92 +296,102 @@ public class McGill {
 	}
 
 	public static String borrowBookToUser(String userID, String itemID, int numberOfDays) {
+			String lib = itemID.substring(0, 3).toUpperCase();
+			logger.info("->" + itemID + "," + userID);
+			switch (lib) {
+			case "MCG":
+				if (Books.containsKey(itemID)) {
+					int quantity = Integer.parseInt(Books.get(itemID).split(",")[1]);
+					logger.info("@");
+					logger.info("-->" + Books.get(itemID).split(",")[1]);
+					if (quantity > 0) {
+						logger.info("Books in MCGill Library before user request " + Books);
+						if (userID.contains("MCG")) {
+							message = setUserDetails(userID, itemID, numberOfDays);
+							logger.info(userID + "User borrowed book details after borrowing MCGill library book "
+									+ userlist.get(userID));
+						}
+						if (message.contains("Successfully")) {
+							quantity--;
+							Books.put(itemID, Books.get(itemID).split(",")[0] + "," + quantity);
+						}
 
-		String lib = itemID.substring(0, 3).toUpperCase();
-		logger.info("->" + itemID + "," + userID);
-		switch (lib) {
-		case "MCG":
-			if (Books.containsKey(itemID)) {
-				int quantity = Integer.parseInt(Books.get(itemID).split(",")[1]);
-				logger.info("@");
-				logger.info("-->" + Books.get(itemID).split(",")[1]);
-				if (quantity > 0) {
-					logger.info("Books in MCGill Library before user request " + Books);
-					if (userID.contains("MCG")) {
-						message = setUserDetails(userID, itemID, numberOfDays);
-						logger.info(userID + "User borrowed book details after borrowing MCGill library book "
-								+ userlist.get(userID));
+						logger.info("Books in MCGill Library after user request" + Books);
+					} else {
+						message = "Unavailable :  Book requested is currently not available";
 					}
-					if (message.contains("Successfully")) {
-						quantity--;
-						Books.put(itemID, Books.get(itemID).split(",")[0] + "," + quantity);
-					}
-
-					logger.info("Books in MCGill Library after user request" + Books);
 				} else {
-					message = "Unavailable :  Book requested is currently not available";
+					message = "InvalidBook : Book ID Provided is Invalid";
 				}
-			} else {
-				message = "InvalidBook : Book ID Provided is Invalid";
-			}
-			break;
+				break;
 
-		case "MON":
+			case "MON":
 
-			if (isUserAllowedInterLibraryBorrow(lib, userID)) {
-				logger.info("User is allowed to burrow requested book from Montreal Library");
-				logger.info("***********************************************");
+				if (isUserAllowedInterLibraryBorrow(lib, userID)) {
+					logger.info("User is allowed to borrow requested book from Montreal Library");
+					logger.info("***********************************************");
 
-				if (message.contains("Successfully")) {
-					sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays + "," + message;
-					sendMessage(2222);
-					message = dataReceived;
 					if (message.contains("Successfully")) {
-						message = setUserDetails(userID, itemID, numberOfDays);
-						logger.info(userID + "User borrowed book details after borrowing Montreal library book "
-								+ userlist.get(userID));
+						sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays + ","
+								+ message;
+						sendMessage(2222);
+						message = dataReceived;
+						if (message.contains("Successfully")) {
+							message = setUserDetails(userID, itemID, numberOfDays);
+							logger.info(userID + "User borrowed book details after borrowing Montreal library book "
+									+ userlist.get(userID));
+						}
+
 					}
-
+				} else {
+					message = "User has already borrowed one Montreal Library book";
 				}
-			} else {
-				message = "User has already borrowed one Montreal Library book";
-			}
-			break;
+				break;
 
-		case "CON":
-			if (isUserAllowedInterLibraryBorrow(lib, userID)) {
-				logger.info("User is allowed to burrow requested book from Concordia");
-				logger.info("***********************************************");
+			case "CON":
+				if (isUserAllowedInterLibraryBorrow(lib, userID)) {
+					logger.info("User is allowed to borrow requested book from Concordia");
+					logger.info("***********************************************");
 
-				if (message.contains("Successfully")) {
-					sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays + "," + message;
-					sendMessage(1111);
-					message = dataReceived;
 					if (message.contains("Successfully")) {
-						message = setUserDetails(userID, itemID, numberOfDays);
-						logger.info(userID + "User borrowed book details after borrowing Concordia library book "
-								+ userlist.get(userID));
-					}
+						sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays + ","
+								+ message;
+						sendMessage(1111);
+						message = dataReceived;
+						if (message.contains("Successfully")) {
+							message = setUserDetails(userID, itemID, numberOfDays);
+							logger.info(userID + "User borrowed book details after borrowing Concordia library book "
+									+ userlist.get(userID));
+						}
 
+					}
+				} else {
+					message = "User has already borrowed one Concordia Library book";
 				}
-			} else {
-				message = "User has already borrowed one Concordia Library book";
+				break;
 			}
-			break;
-		}
 
 		return message;
 	}
 
 	public static String addUserToWaitlist(String userID, String itemID, int numberOfDays) {
+		HashMap<String, Integer> userInfo;
 		String library = itemID.substring(0, 3).toUpperCase();
 		switch (library) {
 		case "MCG":
-			waitUserList.put(userID, numberOfDays);
-			waitlistBook.put(itemID, waitUserList);
-			message = "Added user " + userID + " to " + itemID + " waitlist Successfully !!";
-			logger.info("Wait list of Concordia Book List : ");
-			waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
+			if (waitlistBook.containsKey(itemID)) {
+				userInfo = waitlistBook.get(itemID);
+				if (userInfo.containsKey(userID)) {
+					message = "User " + userID + " already in waitlist of book with item ID " + itemID;
+					logger.info(message);
+				} else {
+					waitUserList.put(userID, numberOfDays);
+					waitlistBook.put(itemID, waitUserList);
+					message = "Added user " + userID + " to " + itemID + " waitlist Successfully !!";
+					logger.info("Wait list of Concordia Book List : ");
+					waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
+				}
+			}
 			break;
 
 		case "CON":

@@ -15,7 +15,6 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 	private static final long serialVersionUID = 1L;
 	private String operation = "";
 	private int oldQuantity;
-	
 
 	public ActionServiceImpl() throws RemoteException {
 		super();
@@ -34,6 +33,8 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 					Concordia.Books.put(itemID, itemName + "," + quantity);
 					operation = "Item " + itemID + " exists, hence increased item's quantity by " + quantity
 							+ " Successfully";
+//					checkIfUserIsInWaitlist();
+//					assignBookToUser();
 				} else {
 					operation = "A book already exists with item ID: " + itemID + " with a Different Name";
 				}
@@ -56,7 +57,7 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 				}
 			} else {
 				Montreal.Books.put(itemID, itemName + "," + quantity);
-				Montreal.waitlistBook.put(itemID, new HashMap<String,Integer>());
+				Montreal.waitlistBook.put(itemID, new HashMap<String, Integer>());
 				operation = "Item " + itemID + " added to the library";
 			}
 			System.out.println(Montreal.Books);
@@ -76,7 +77,7 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 				}
 			} else {
 				McGill.Books.put(itemID, itemName + "," + quantity);
-				McGill.waitlistBook.put(itemID, new HashMap<String,Integer>());
+				McGill.waitlistBook.put(itemID, new HashMap<String, Integer>());
 				operation = "Item " + itemID + " added to the library";
 			}
 			break;
@@ -89,20 +90,19 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 		itemID = itemID.toUpperCase();
 		switch (managerID.substring(0, 3)) {
 		case "CON":
-			operation=Concordia.removeItemFromLibrary(itemID, quantity);
+			operation = Concordia.removeItemFromLibrary(itemID, quantity);
 			break;
-			
+
 		case "MON":
-			operation=Montreal.removeItemFromLibrary(itemID, quantity);
+			operation = Montreal.removeItemFromLibrary(itemID, quantity);
 			break;
 
 		case "MCG":
-			operation=McGill.removeItemFromLibrary(itemID, quantity);
+			operation = McGill.removeItemFromLibrary(itemID, quantity);
 			break;
 		}
 		return operation;
 	}
-	
 
 	@Override
 	public HashMap<String, String> listItemAvailability(String managerID) {
@@ -130,7 +130,7 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 	public String borrowItem(String userID, String itemID, int numberOfDays) {
 		operation = "";
 		itemID = itemID.toUpperCase();
-		System.out.println(userID+","+itemID);
+		System.out.println(userID + "," + itemID);
 		switch (userID.substring(0, 3)) {
 		case "CON":
 			operation = Concordia.borrowBookToUser(userID, itemID, numberOfDays);
@@ -144,7 +144,6 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 		}
 		return operation;
 	}
-	
 
 	@Override
 	public String waitList(String userID, String itemID, int numberOfdays) throws RemoteException {
@@ -163,7 +162,7 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 		}
 		return operation;
 	}
-	
+
 	@Override
 	public String findItem(String userId, String itemName) {
 		String booklist = new String();

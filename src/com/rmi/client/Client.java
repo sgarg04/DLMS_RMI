@@ -61,14 +61,14 @@ public class Client {
 //	@return boolean value of isValidUserFlag
 //	@params String array of user and user id entered
 
-	private static boolean isValidUser(String[] userIDs, String userID) {
-		int c = 0;
-		for (String id : userIDs) {
-			c = id.equalsIgnoreCase(userID) ? c = c + 1 : c;
-		}
-		isValidUserFlag = (c == 1) ? true : false;
-		return isValidUserFlag;
-	}
+//	private static boolean isValidUser(String[] userIDs, String userID) {
+//		int c = 0;
+//		for (String id : userIDs) {
+//			c = id.equalsIgnoreCase(userID) ? c = c + 1 : c;
+//		}
+//		isValidUserFlag = (c == 1) ? true : false;
+//		return isValidUserFlag;
+//	}
 
 	private static boolean isOperatorIdCorrect(String operatorID) {
 		isIDCorrect = false;
@@ -152,21 +152,30 @@ public class Client {
 				logger.info("Manager with manager id " + managerID + "opted to add a book");
 				System.out.println("\nPlease provide the following details to add a book in the library:");
 				isItemIdCorrect = false;
-				while (!isItemIdCorrect) {
+				Boolean loop = true;
+				while (loop) {
 					System.out.print("\nEnter the book id : ");
 					itemId = reader.readLine();
 					isItemIdCorrect = isItemIdCorrect(serverName, itemId);
 					if (!isItemIdCorrect) {
 						logger.log(Level.SEVERE, "\nThe entered book id has an invalid format\n");
-						System.err.println("\nSorry! The entered book id has an invalid format \n");
+						System.out.println("\nSorry! The entered book id has an invalid format \n");
+						break;
 					}
-				}
-				System.out.print("\nEnter the associated book name : ");
-				String itemName = (reader.readLine());
-				Boolean loop = true;
-				while (loop) {
+					System.out.print("\nEnter the associated book name : ");
+					String itemName = (reader.readLine());
+					if (itemName.isEmpty()) {
+						System.out.println("\nSorry! The entered book name cannot be blank \n");
+						break;
+					}
 					System.out.print("\nEnter the quantity of book(s) to be added : ");
-					int quantity = Integer.parseInt(reader.readLine());
+
+					try {
+						quantity = Integer.parseInt(reader.readLine());
+					} catch (NumberFormatException ex) {
+						System.out.println("Quantity cannot be empty.");
+						break;
+					}
 					if (quantity > 0) {
 						System.out.println("\nAdding book with book id " + itemId + " and book name " + itemName
 								+ " and quantity " + quantity);
@@ -180,7 +189,8 @@ public class Client {
 						loop = false;
 					} else {
 						logger.log(Level.SEVERE, "\nInvalid quantity entered. Entered book's quantity is " + quantity);
-						System.err.println("\nPlease enter a valid quantity. It cannot be less than or equal to zero.");
+						System.out.println("\nPlease enter a valid quantity. It cannot be less than or equal to zero.");
+						break;
 					}
 				}
 
@@ -190,23 +200,30 @@ public class Client {
 				logger.info("Manager with manager id " + managerID + "opted to delete/reduce a book");
 				System.out.println("\nPlease provide the below details to perform the requested operation in library:");
 				isItemIdCorrect = false;
-				while (!isItemIdCorrect) {
+				String output;
+				int choice;
+				Boolean correctchoice = true;
+				while (correctchoice) {
 					System.out.print("\nEnter the book id : ");
 					itemId = (reader.readLine());
 					isItemIdCorrect = isItemIdCorrect(serverName, itemId);
-					if (!isItemIdCorrect)
+					if (!isItemIdCorrect) {
+						System.out.println(
+								"The given book id has an invalid format. Please try again with a valid book id.");
 						logger.log(Level.SEVERE, "\nInvalid Item Id, Enterred Item id : " + itemId);
-					System.err
-							.println("The given book id has an invalid format. Please try again with a valid book id.");
-				}
-				String output;
-				Boolean correctchoice = true;
-				while (correctchoice) {
+						break;
+					}
+
 					System.out.println("\nPlease chose the following operation for removal : "
 							+ "\nType 1 to Remove the entire item from library."
 							+ "\nType 2 to Decrease the quantity of the book.");
 					System.out.print("\nEnter your choice : ");
-					int choice = Integer.parseInt(reader.readLine());
+					try {
+						choice = Integer.parseInt(reader.readLine());
+					} catch (NumberFormatException ex) {
+						System.out.println("Choice cannot be empty.");
+						break;
+					}
 					if (choice == 1) {
 						quantity = -1;
 						logger.info("***** Manager with manager ID " + managerID
@@ -221,7 +238,12 @@ public class Client {
 						loop = true;
 						while (loop) {
 							System.out.print("\nEnter the quantity by which the book's quantity be reduced :");
-							quantity = Integer.parseInt(reader.readLine());
+							try {
+								quantity = Integer.parseInt(reader.readLine());
+							} catch (NumberFormatException ex) {
+								System.out.println("\nQuantity cannot be empty.");
+								break;
+							}
 							if (quantity > 0) {
 								logger.info("***** Manager with manager ID " + managerID
 										+ "initiated an reduce quantity of book request for book id " + itemId
@@ -230,19 +252,19 @@ public class Client {
 								output = serverRef.removeItem(operatorID, itemId, quantity);
 								logger.info("Response received from server : " + output);
 								if (!output.contains("INVALID")) {
-									System.out.println(output + "\n");
+									System.out.println("\n" + output);
 									loop = false;
 									correctchoice = false;
 								} else if (output.equals("Invalid Quantity")) {
 									logger.log(Level.SEVERE, "(The quantity of books available for the book id" + itemId
 											+ " is lesser than the quantity provided) \nInvalid quantity, Entered quantity : "
 											+ quantity);
-									System.err.println("\nThe entered quantity is invalid."
+									System.out.println("\nThe entered quantity is invalid."
 											+ "(The quantity of books available for the book id" + itemId
 											+ " is lesser than the quantity provided)");
 								} else if (output.equals("Invalid Book")) {
 									logger.log(Level.SEVERE, "Invalid book id, Entered book id : " + itemId);
-									System.err.println(
+									System.out.println(
 											"\nThe entered book id has an invalid format. Please try again with a valid book id.");
 									loop = false;
 									correctchoice = false;
@@ -279,7 +301,7 @@ public class Client {
 
 			}
 
-			System.out.println("Do you want continue further operation - Yes/No ");
+			System.out.println("\nDo you want continue further operation - Yes/No ");
 			proceedM = (reader.readLine());
 			if (!proceedM.equalsIgnoreCase("yes")) {
 				System.out.println("Thank You\n");
@@ -287,6 +309,7 @@ public class Client {
 			}
 
 		}
+
 	}
 
 	public static void userOperation(String userID) throws IOException {
@@ -298,25 +321,30 @@ public class Client {
 			System.out.println("\nEnter your choice : \n" + "\n1. Type 1 to borrow a book from the library."
 					+ "\n2. Type 2 to find a book in the library."
 					+ "\n3. Type 3 to return a book back to the library \n");
-			System.out.print(" Enter your choice : ");
+			System.out.print("Enter your choice : ");
 			String managerCommand = (reader.readLine());
 			switch (managerCommand) {
 			case "1":
 				logger.info("User with user id " + userID + "opted for borrow a book");
 				System.out.println("\nPlease provide the following details to borrow book from library: \n");
 				isItemIdCorrect = false;
-				while (!isItemIdCorrect) {
+				Boolean loop = true;
+				int numberOfDays = 0;
+				while (loop) {
 					System.out.print("\nEnter item id of the book : ");
 					itemId = (reader.readLine());
 					isItemIdCorrect = isItemIdCorrect(itemId);
-					if (!isItemIdCorrect)
-						System.err.println("\nInvalid Item Id: Enter Valid Item id \n");
-				}
-
-				Boolean loop = true;
-				while (loop) {
+					if (!isItemIdCorrect) {
+						System.out.println("\nInvalid Item Id: Enter Valid Item id \n");
+						break;
+					}
 					System.out.print("\nEnter the number of days you wish to borrow the book : ");
-					int numberOfDays = Integer.parseInt(reader.readLine());
+					try {
+						numberOfDays = Integer.parseInt(reader.readLine());
+					} catch (NumberFormatException ex) {
+						System.out.println("\nQuantity cannot be empty.");
+						break;
+					}
 					if (numberOfDays > 0) {
 						logger.info("***** User with user ID " + userID + "initiated a borrow request for a book "
 								+ itemId + "in " + serverName + " library");
@@ -325,7 +353,7 @@ public class Client {
 						if (operation.contains("Unavailable")) {
 							System.out.println("\nBook with item ID: " + itemId + " is unavailable!");
 							logger.info("Response received from server : " + operation);
-							System.out.println("\nDo you wish to enter into a waitlist?  Yes or No : ");
+							System.out.print("\nDo you wish to enter into a waitlist?  Yes or No : ");
 							String choice = reader.readLine();
 							if (choice.equalsIgnoreCase("Yes")) {
 								logger.info("User opted to enter a waitlist");
@@ -335,17 +363,15 @@ public class Client {
 								logger.info("***** Entering waitList operation ****");
 								operation = serverRef.waitList(userID, itemId, numberOfDays);
 								logger.info("Response received from server : " + operation);
-								System.out.println(operation + "\n");
+								System.out.println("\n" + operation);
 							} else {
 								System.out.println("\nAlright! We did not add you in wait list.\n");
 								logger.info("User did not opt to enter a waitlist");
 							}
 
 						} else {
-							System.out.println("\nBorrowed book with Book id : " + itemId + " for " + numberOfDays
-									+ " number of days.");
 							logger.info("Response received from server : " + operation);
-							System.out.println(operation);
+							System.out.println("\n" + operation);
 						}
 						loop = false;
 					} else {
@@ -413,6 +439,7 @@ public class Client {
 			}
 
 		}
+
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -457,12 +484,12 @@ public class Client {
 							break;
 
 						case 'U':
-							if (!isValidUser(userIDs, operatorID)) {
-								System.out.println("\nSorry! You are not an authorized User to avail library service.");
-							} else {
-								loggingOperator("User", operatorID);
-								userOperation(operatorID);
-							}
+//							if (!isValidUser(userIDs, operatorID)) {
+//								System.out.println("\nSorry! You are not an authorized User to avail library service.");
+//							} else {
+							loggingOperator("User", operatorID);
+							userOperation(operatorID);
+//							}
 							break;
 						}
 					} catch (NumberFormatException e) {
