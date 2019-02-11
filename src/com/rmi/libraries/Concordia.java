@@ -178,33 +178,33 @@ public class Concordia {
 		}
 	}
 
-	public static boolean isUserInWaitlistForSameItemID(String userID) {
-		boolean isUserInWaitList = false;
-		HashMap<String, Integer> waitUserInfo;
-		int count;
-		if (!waitlistBook.isEmpty()) {
-			System.out.println("waitlistBook" + waitlistBook);
-			count = 0;
-			Iterator<Entry<String, HashMap<String, Integer>>> waitListIterator = waitlistBook.entrySet().iterator();
-			while (waitListIterator.hasNext()) {
-				count = 0;
-				Entry<String, HashMap<String, Integer>> thisEntry = waitListIterator.next();
-				waitUserInfo = thisEntry.getValue();
-				System.out.println("waitUserInfo " + waitUserInfo);
-				if (waitUserInfo.containsKey(userID)) {
-					count++;
-					System.out.println("waitUserInfo : " + waitUserInfo + "userID : " + userID);
-					System.out.println("count :" + count);
-				}
-			}
-			isUserInWaitList = count == 1 ? true : false;
-		} else {
-			isUserInWaitList = false;
-
-		}
-		System.out.println("isUserWaitListValid" + isUserInWaitList);
-		return isUserInWaitList;
-	}
+//	public static boolean isUserInWaitlistForSameItemID(String userID) {
+//		boolean isUserInWaitList = false;
+//		HashMap<String, Integer> waitUserInfo;
+//		int count;
+//		if (!waitlistBook.isEmpty()) {
+//			System.out.println("waitlistBook" + waitlistBook);
+//			count = 0;
+//			Iterator<Entry<String, HashMap<String, Integer>>> waitListIterator = waitlistBook.entrySet().iterator();
+//			while (waitListIterator.hasNext()) {
+//				count = 0;
+//				Entry<String, HashMap<String, Integer>> thisEntry = waitListIterator.next();
+//				waitUserInfo = thisEntry.getValue();
+//				System.out.println("waitUserInfo " + waitUserInfo);
+//				if (waitUserInfo.containsKey(userID)) {
+//					count++;
+//					System.out.println("waitUserInfo : " + waitUserInfo + "userID : " + userID);
+//					System.out.println("count :" + count);
+//				}
+//			}
+//			isUserInWaitList = count == 1 ? true : false;
+//		} else {
+//			isUserInWaitList = false;
+//
+//		}
+//		System.out.println("isUserWaitListValid" + isUserInWaitList);
+//		return isUserInWaitList;
+//	}
 
 	public static boolean isUserAllowedInterLibraryBorrow(String library, String userID) {
 
