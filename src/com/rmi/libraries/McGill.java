@@ -32,7 +32,7 @@ public class McGill {
 	private static String sendRequestReceived;
 	private static String dataReceived;
 	private static String message;
-	private static Logger logger;
+	public static Logger logger;
 	static private FileHandler fileHandler;
 
 	protected McGill() throws RemoteException {
@@ -314,14 +314,17 @@ public class McGill {
 						if (message.contains("Successfully")) {
 							quantity--;
 							Books.put(itemID, Books.get(itemID).split(",")[0] + "," + quantity);
+							logger.info("Request completed successfully");
 						}
 
 						logger.info("Books in MCGill Library after user request" + Books);
 					} else {
 						message = "Unavailable :  Book requested is currently not available";
+						logger.info("Request failed");
 					}
 				} else {
 					message = "InvalidBook : Book ID Provided is Invalid";
+					logger.info("Request failed");
 				}
 				break;
 

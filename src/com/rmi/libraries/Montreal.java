@@ -31,7 +31,7 @@ public class Montreal {
 	private static String sendRequestReceived;
 	private static String dataReceived;
 	private static String message;
-	private static Logger logger;
+	public static Logger logger;
 	static private FileHandler fileHandler;
 
 	protected Montreal() throws RemoteException {
@@ -301,11 +301,13 @@ public class Montreal {
 					if (message.contains("Successfully")) {
 						quantity--;
 						Books.put(itemID, Books.get(itemID).split(",")[0] + "," + quantity);
+						logger.info("Request completed successfully");
 					}
 
 					logger.info("Books in Montreal Library after user request" + Books);
 				} else {
 					message = "Unavailable :  Book requested is currently not available";
+					logger.info("Request failed");
 				}
 			}
 			break;
@@ -514,6 +516,7 @@ public class Montreal {
 					Books.put(itemID, keyValue);
 					operation = "Book's quantity decreased by" + quantity + " Successfully  from the avaialable list! ";
 					logger.info("After removal" + Books.toString());
+					logger.info("Request completed successfully");
 				} else if (quantity == -1) {
 					Books.remove(itemID);
 					removeItemFromuserlist(itemID);
@@ -531,10 +534,11 @@ public class Montreal {
 
 			else if (oldquantity < quantity) {
 				operation = "Invalid Quantity , Please enter a valid Quantity to be deleted";
-				logger.info("Invalid Quantity , Please enter a valid Quantity to be deleted ");
+				logger.info("Request failed");
 			}
 		} else {
 			operation = "Invalid Book : Book is not available in Library";
+			logger.info("Request failed");
 		}
 		return operation;
 	}
@@ -557,5 +561,6 @@ public class Montreal {
 		}
 		logger.info("After Removal of Item Id from library, Montreal userList:" + userlist.toString());
 		logger.info("After Removal of Item Id from library, Montreal waitList:" + waitlistBook.toString());
+		logger.info("Request completed successfully");
 	}
 }

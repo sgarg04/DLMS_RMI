@@ -30,7 +30,7 @@ public class Concordia {
 	private static String sendRequestReceived;
 	private static String dataReceived;
 	private static String message;
-	private static Logger logger;
+	public static Logger logger;
 	static FileHandler fileHandler;
 
 	public Concordia() throws RemoteException {
@@ -338,14 +338,17 @@ public class Concordia {
 					if (message.contains("Successfully")) {
 						quantity--;
 						Books.put(itemID, Books.get(itemID).split(",")[0] + "," + quantity);
+						logger.info("Request completed successfully");
 					}
 
 					logger.info("Books in Concordia Library after user request" + Books);
 				} else {
 					message = "Unavailable :  Book requested is currently not available";
+					logger.info("Request failed");
 				}
 			} else {
 				message = "InvalidBook: Book ID is Invalid. PLease Provide a Valid Item Id ";
+				logger.info("Request failed");
 			}
 			break;
 
@@ -552,6 +555,7 @@ public class Concordia {
 					operation = "Book's quantity decreased by " + quantity
 							+ " Successfully  from the avaialable list! ";
 					logger.info("After removal" + Books.toString());
+					logger.info("Request completed successfully");
 				} else if (quantity == -1) {
 					Books.remove(itemID);
 					removeItemFromuserlist(itemID);
@@ -569,10 +573,11 @@ public class Concordia {
 
 			else if (oldquantity < quantity) {
 				operation = "Invalid Quantity , Please enter a valid Quantity to be deleted";
-				logger.info("Invalid Quantity , Please enter a valid Quantity to be deleted ");
+				logger.info("Request failed");
 			}
 		} else {
 			operation = "Invalid Book : Book is not available in Library";
+			logger.info("Request failed");
 		}
 		return operation;
 	}
@@ -595,6 +600,7 @@ public class Concordia {
 		}
 		logger.info("After Removal of Item Id from library, Concordia userList:" + userlist.toString());
 		logger.info("After Removal of Item Id from library, Concordia waitList:" + waitlistBook.toString());
+		logger.info("Request completed successfully");
 	}
 
 }

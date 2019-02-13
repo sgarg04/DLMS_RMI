@@ -26,6 +26,9 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 		operation = "";
 		switch (managerID.substring(0, 3)) {
 		case "CON":
+			Concordia.logger.info("*****Entering Concordia Server*****");
+			Concordia.logger.info("Request Type: Add an item , Request params: managerID" + managerID + ", itemID "
+					+ itemID + ", itemName " + itemName + ", quantity " + quantity);
 			if (Concordia.Books.containsKey(itemID)) {
 				if (Concordia.Books.get(itemID).split(",")[0].equalsIgnoreCase(itemName)) {
 					oldQuantity = Integer.parseInt(Concordia.Books.get(itemID).split(",")[1]);
@@ -33,37 +36,49 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 					Concordia.Books.put(itemID, itemName + "," + quantity);
 					operation = "Item " + itemID + " exists, hence increased item's quantity by " + quantity
 							+ " Successfully";
-//					checkIfUserIsInWaitlist();
-//					assignBookToUser();
+					Concordia.logger.info("Request successfully completed");
 				} else {
 					operation = "A book already exists with item ID: " + itemID + " with a Different Name";
+					Concordia.logger.info("Request failed");
 				}
 			} else {
 				Concordia.Books.put(itemID, itemName + "," + quantity);
 				operation = "Item " + itemID + " added to the library Successfully";
+				Concordia.logger.info("Request successfully completed");
 			}
 			System.out.println(Concordia.Books);
+			Concordia.logger.info("Response returned: " + operation);
 			break;
 
 		case "MON":
+			Montreal.logger.info("*****Entering Montreal Server*****");
+			Montreal.logger.info("Request Type: Add an item , Request params: managerID" + managerID + ", itemID "
+					+ itemID + ", itemName " + itemName + ", quantity " + quantity);
 			if (Montreal.Books.containsKey(itemID)) {
 				if (Montreal.Books.get(itemID).split(",")[0].equalsIgnoreCase(itemName)) {
 					oldQuantity = Integer.parseInt(Montreal.Books.get(itemID).split(",")[1]);
 					quantity = oldQuantity + quantity;
 					Montreal.Books.put(itemID, itemName + "," + quantity);
 					operation = "Item " + itemID + " exists, hence increased item's quantity";
+					Montreal.logger.info("Request successfully completed");
 				} else {
 					operation = "A book already exists with item ID: " + itemID + " with a Different Name";
+					Montreal.logger.info("Request failed");
 				}
 			} else {
 				Montreal.Books.put(itemID, itemName + "," + quantity);
 				Montreal.waitlistBook.put(itemID, new HashMap<String, Integer>());
 				operation = "Item " + itemID + " added to the library";
+				Montreal.logger.info("Request successfully completed");
 			}
 			System.out.println(Montreal.Books);
+			Montreal.logger.info("Response returned: " + operation);
 			break;
 
 		case "MCG":
+			McGill.logger.info("*****Entering McGill Server*****");
+			McGill.logger.info("Request Type: Add an item , Request params: managerID" + managerID + ", itemID "
+					+ itemID + ", itemName " + itemName + ", quantity " + quantity);
 			if (McGill.Books.containsKey(itemID)) {
 				if (McGill.Books.get(itemID).split(",")[0].equalsIgnoreCase(itemName)) {
 					oldQuantity = Integer.parseInt(McGill.Books.get(itemID).split(",")[1]);
@@ -71,15 +86,20 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 					McGill.Books.put(itemID, itemName + "," + quantity);
 					System.out.println(McGill.Books);
 					operation = "Item " + itemID + " exists, hence increased item's quantity";
+					McGill.logger.info("Request successfully completed");
 
 				} else {
 					operation = "A book already exists with item ID: " + itemID + " with a Different Name";
+					McGill.logger.info("Request failed");
 				}
 			} else {
 				McGill.Books.put(itemID, itemName + "," + quantity);
 				McGill.waitlistBook.put(itemID, new HashMap<String, Integer>());
 				operation = "Item " + itemID + " added to the library";
+				McGill.logger.info("Request successfully completed");
 			}
+			System.out.println(McGill.Books);
+			McGill.logger.info("Response returned: " + operation);
 			break;
 		}
 		return operation;
@@ -90,15 +110,27 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 		itemID = itemID.toUpperCase();
 		switch (managerID.substring(0, 3)) {
 		case "CON":
+			Concordia.logger.info("*****Entering Concordia Server*****");
+			Concordia.logger.info("Request Type: Remove an item , Request params: managerID" + managerID + ", itemID "
+					+ itemID +", quantity " + quantity);
 			operation = Concordia.removeItemFromLibrary(itemID, quantity);
+			Concordia.logger.info("Response returned: " + operation);
 			break;
 
 		case "MON":
+			Montreal.logger.info("*****Entering Montreal Server*****");
+			Montreal.logger.info("Request Type: Remove an item , Request params: managerID" + managerID + ", itemID "
+					+ itemID +", quantity " + quantity);
 			operation = Montreal.removeItemFromLibrary(itemID, quantity);
+			Montreal.logger.info("Response returned: " + operation);
 			break;
 
 		case "MCG":
+			McGill.logger.info("*****Entering McGill Server*****");
+			McGill.logger.info("Request Type: Remove an item , Request params: managerID" + managerID + ", itemID "
+					+ itemID +", quantity " + quantity);
 			operation = McGill.removeItemFromLibrary(itemID, quantity);
+			McGill.logger.info("Response returned: " + operation);
 			break;
 		}
 		return operation;
@@ -111,16 +143,25 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 
 		switch (managerID.substring(0, 3)) {
 		case "CON":
+			Concordia.logger.info("*****Entering Concordia Server*****");
+			Concordia.logger.info("Request Type: List items , Request params: managerID" + managerID);
 			System.out.println(Concordia.Books);
 			bookList = Concordia.Books;
+			Concordia.logger.info("Response returned: " + bookList);
 			break;
 		case "MON":
+			Montreal.logger.info("*****Entering Montreal Server*****");
+			Montreal.logger.info("Request Type: List items , Request params: managerID" + managerID);
 			System.out.println(Montreal.Books);
 			bookList = Montreal.Books;
+			Montreal.logger.info("Response returned: " + bookList);
 			break;
 		case "MCG":
+			McGill.logger.info("*****Entering McGill Server*****");
+			McGill.logger.info("Request Type: List items , Request params: managerID" + managerID);
 			System.out.println(McGill.Books);
 			bookList = McGill.Books;
+			McGill.logger.info("Response returned: " + bookList);
 			break;
 		}
 		return bookList;
@@ -133,13 +174,25 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 		System.out.println(userID + "," + itemID);
 		switch (userID.substring(0, 3)) {
 		case "CON":
+			Concordia.logger.info("*****Entering Concordia Server*****");
+			Concordia.logger.info("Request Type: Add an item , Request params: userID" + userID + ", itemID "
+					+ itemID + ", numberOfDays " + numberOfDays);
 			operation = Concordia.borrowBookToUser(userID, itemID, numberOfDays);
+			Concordia.logger.info("Response returned: " + operation);
 			break;
 		case "MON":
+			Montreal.logger.info("*****Entering Montreal Server*****");
+			Montreal.logger.info("Request Type: Add an item , Request params: userID" + userID + ", itemID "
+					+ itemID + ", numberOfDays " + numberOfDays);
 			operation = Montreal.borrowBookToUser(userID, itemID, numberOfDays);
+			Montreal.logger.info("Response returned: " + operation);
 			break;
 		case "MCG":
+			McGill.logger.info("*****Entering McGill Server*****");
+			McGill.logger.info("Request Type: Add an item , Request params: userID" + userID + ", itemID "
+					+ itemID + ", numberOfDays " + numberOfDays);
 			operation = McGill.borrowBookToUser(userID, itemID, numberOfDays);
+			McGill.logger.info("Response returned: " + operation);
 			break;
 		}
 		return operation;

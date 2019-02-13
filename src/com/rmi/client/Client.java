@@ -149,7 +149,7 @@ public class Client {
 			switch (managerCommand) {
 
 			case "1":
-				logger.info("Manager with manager id " + managerID + "opted to add a book");
+				logger.info("\nManager with manager id " + managerID + "opted to add a book");
 				System.out.println("\nPlease provide the following details to add a book in the library:");
 				isItemIdCorrect = false;
 				Boolean loop = true;
@@ -179,12 +179,13 @@ public class Client {
 					if (quantity > 0) {
 						System.out.println("\nAdding book with book id " + itemId + " and book name " + itemName
 								+ " and quantity " + quantity);
-						logger.info("***** Manager with manager ID " + managerID
+						logger.info("\n***** Manager with manager ID " + managerID
 								+ "initiated an add book request for book id \n" + itemId + " book name " + itemName
 								+ " quantity " + quantity + " in " + serverName + " library");
-						logger.info("***** Entering addItem operation ****");
+						logger.info("\n***** Entering addItem operation ****");
+						logger.info("\nRequest: addItem method with params managerID "+operatorID+", itemId "+ itemId+ ", itemName "+itemName+", quantity "+quantity);
 						String result = serverRef.addItem(operatorID, itemId, itemName, quantity);
-						logger.info("Response received from server : " + result);
+						logger.info("\nResponse received from server : " + result);
 						System.out.println("\n" + result);
 						loop = false;
 					} else {
@@ -197,7 +198,7 @@ public class Client {
 				break;
 
 			case "2":
-				logger.info("Manager with manager id " + managerID + "opted to delete/reduce a book");
+				logger.info("\nManager with manager id " + managerID + "opted to delete/reduce a book");
 				System.out.println("\nPlease provide the below details to perform the requested operation in library:");
 				isItemIdCorrect = false;
 				String output;
@@ -226,12 +227,13 @@ public class Client {
 					}
 					if (choice == 1) {
 						quantity = -1;
-						logger.info("***** Manager with manager ID " + managerID
+						logger.info("\n***** Manager with manager ID " + managerID
 								+ "initiated an remove book request for book id " + itemId + " in " + serverName
 								+ " library");
-						logger.info("***** Entering removeItem operation to remove the entire book ****");
+						logger.info("\n***** Entering removeItem operation to remove the entire book ****");
+						logger.info("\nRequest: removeItem method with params managerID "+operatorID+", itemId "+ itemId+", quantity "+quantity);
 						output = serverRef.removeItem(operatorID, itemId, quantity);
-						logger.info("Response received from server : " + output);
+						logger.info("\nResponse received from server : " + output);
 						System.out.println(output);
 						correctchoice = false;
 					} else if (choice == 2) {
@@ -245,12 +247,13 @@ public class Client {
 								break;
 							}
 							if (quantity > 0) {
-								logger.info("***** Manager with manager ID " + managerID
+								logger.info("\n***** Manager with manager ID " + managerID
 										+ "initiated an reduce quantity of book request for book id " + itemId
 										+ " with quantity " + quantity + " in " + serverName + " library");
-								logger.info("***** Entering removeItem operation to remove the entire book ****");
+								logger.info("\n***** Entering removeItem operation to reduce the quantity of the book ****");
+								logger.info("\nRequest: removeItem method with params managerID "+operatorID+", itemId "+ itemId+", quantity "+quantity);
 								output = serverRef.removeItem(operatorID, itemId, quantity);
-								logger.info("Response received from server : " + output);
+								logger.info("\nResponse received from server : " + output);
 								if (!output.contains("INVALID")) {
 									System.out.println("\n" + output);
 									loop = false;
@@ -284,11 +287,12 @@ public class Client {
 				break;
 
 			case "3":
-				logger.info("Manager with manager id " + managerID + "opted to list all the books in the library");
+				logger.info("\nManager with manager id " + managerID + "opted to list all the books in the library");
 				HashMap<String, String> bookList = new HashMap<String, String>();
-				logger.info("***** Entering listItemAvailability operation to list all the books in library ****");
+				logger.info("\n***** Entering listItemAvailability operation to list all the books in library ****");
+				logger.info("\nRequest: listItemAvailability method with params managerID "+operatorID);
 				bookList = serverRef.listItemAvailability(operatorID);
-				logger.info("Response received from server : " + bookList);
+				logger.info("\nResponse received from server : " + bookList);
 				System.out.println("\nBooks Available in Library are : ");
 				bookList.forEach(
 						(k, v) -> System.out.println(("\n* " + k + " " + v.split(",")[0] + " " + v.split(",")[1])));
@@ -325,7 +329,7 @@ public class Client {
 			String managerCommand = (reader.readLine());
 			switch (managerCommand) {
 			case "1":
-				logger.info("User with user id " + userID + "opted for borrow a book");
+				logger.info("\nUser with user id " + userID + "opted for borrow a book");
 				System.out.println("\nPlease provide the following details to borrow book from library: \n");
 				isItemIdCorrect = false;
 				Boolean loop = true;
@@ -346,31 +350,34 @@ public class Client {
 						break;
 					}
 					if (numberOfDays > 0) {
-						logger.info("***** User with user ID " + userID + "initiated a borrow request for a book "
+						logger.info("\n***** User with user ID " + userID + "initiated a borrow request for a book "
 								+ itemId + "in " + serverName + " library");
-						logger.info("***** Entering borrowItem operation ****");
+						logger.info("\n***** Entering borrowItem operation ****");
+						logger.info("\nRequest: borrowItem method with params userID "+userID+", itemId "+ itemId+", numberOfDays "+numberOfDays);
 						operation = serverRef.borrowItem(userID, itemId, numberOfDays);
+						logger.info("\nResponse received from server : " + operation);
 						if (operation.contains("Unavailable")) {
 							System.out.println("\nBook with item ID: " + itemId + " is unavailable!");
-							logger.info("Response received from server : " + operation);
+							logger.info("\nBook with item ID: " + itemId + " is unavailable!");
 							System.out.print("\nDo you wish to enter into a waitlist?  Yes or No : ");
 							String choice = reader.readLine();
 							if (choice.equalsIgnoreCase("Yes")) {
-								logger.info("User opted to enter a waitlist");
-								logger.info("***** User with user ID " + userID
+								logger.info("\nUser opted to enter a waitlist");
+								logger.info("\n***** User with user ID " + userID
 										+ "initiated a waitlist request for a book " + itemId + "in " + serverName
 										+ "library for number of days: " + numberOfDays);
-								logger.info("***** Entering waitList operation ****");
+								logger.info("\n***** Entering waitList operation ****");
+								logger.info("\nRequest: waitList method with params userID "+userID+", itemId "+ itemId+", numberOfDays "+numberOfDays);
 								operation = serverRef.waitList(userID, itemId, numberOfDays);
-								logger.info("Response received from server : " + operation);
+								logger.info("\nResponse received from server : " + operation);
 								System.out.println("\n" + operation);
 							} else {
 								System.out.println("\nAlright! We did not add you in wait list.\n");
-								logger.info("User did not opt to enter a waitlist");
+								logger.info("\nUser did not opt to enter a waitlist");
 							}
 
 						} else {
-							logger.info("Response received from server : " + operation);
+							logger.info("\nResponse received from server : " + operation);
 							System.out.println("\n" + operation);
 						}
 						loop = false;
@@ -383,14 +390,15 @@ public class Client {
 				break;
 
 			case "2":
-				logger.info("User with user id " + userID + "opted to find a book");
+				logger.info("\nUser with user id " + userID + "opted to find a book");
 				System.out.print("\nEnter item name of the book : ");
 				String itemName = (reader.readLine());
 				String bookList = "";
-				logger.info("User with user id " + userID + "opted to find a book with name as " + itemName);
-				logger.info("***** Entering findItem operation ****");
+				logger.info("\nUser with user id " + userID + "opted to find a book with name as " + itemName);
+				logger.info("\n***** Entering findItem operation ****");
+				logger.info("\nRequest: findItem method with params userID "+userID+", itemName "+ itemName);
 				bookList = serverRef.findItem(userID, itemName);
-				logger.info("Response received from server : " + bookList);
+				logger.info("\nResponse received from server : " + bookList);
 				System.out.println(bookList);
 				if (!bookList.equals("")) {
 					System.out.println("\nBooks Available in Library with '" + itemName + "':\n");
@@ -407,7 +415,7 @@ public class Client {
 				break;
 
 			case "3":
-				logger.info("User with user id " + userID + "opted to return a book");
+				logger.info("\nUser with user id " + userID + "opted to return a book");
 				System.out.println("\nPlease provide the following details to return back the book to library:");
 				isItemIdCorrect = false;
 				while (!isItemIdCorrect) {
@@ -417,11 +425,12 @@ public class Client {
 					if (!isItemIdCorrect)
 						System.err.println("The entered book id has an invalid book format.\n");
 				}
-				logger.info("User with user id " + userID + "opted to return a book with item id " + itemId);
-				logger.info("***** Entering returnItem operation ****");
+				logger.info("\nUser with user id " + userID + "opted to return a book with item id " + itemId);
+				logger.info("\n***** Entering returnItem operation ****");
+				logger.info("\nRequest: returnItem method with params userID "+userID+", itemId "+ itemId);
 				operation = serverRef.returnItem(userID, itemId);
 				System.out.println(operation);
-				logger.info("Response received from server : " + operation);
+				logger.info("\nResponse received from server : " + operation);
 
 				break;
 
@@ -445,8 +454,8 @@ public class Client {
 	public static void main(String[] args) throws Exception {
 		String[] managerIDs = { "CONM1122", "CONM2233", "CONM3344", "CONM4455", "MONMS1122", "MONM2233", "MONM3344",
 				"MONM4455", "MCGM1122", "MCGM2233", "MCGM3344", "MCGM4455" };
-		String[] userIDs = { "CONU1122", "CONU2233", "CONU3344", "CONU4455", "MONUS1122", "MONU2233", "MONU3344",
-				"MONU4455", "MCGU1122", "MCGU2233", "MCGU3344", "MCGU4455" };
+//		String[] userIDs = { "CONU1122", "CONU2233", "CONU3344", "CONU4455", "MONUS1122", "MONU2233", "MONU3344",
+//				"MONU4455", "MCGU1122", "MCGU2233", "MCGU3344", "MCGU4455" };
 		boolean stopRunning = false;
 
 		try {
