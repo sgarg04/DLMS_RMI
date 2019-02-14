@@ -127,6 +127,7 @@ public class Concordia {
 				DatagramPacket request = new DatagramPacket(buffer, buffer.length);
 				aSocket.receive(request);
 				sendRequestReceived = new String(request.getData());
+				logger.info("************************************");
 				logger.info("Request received at Concordia Server");
 				String[] params = sendRequestReceived.split(",");
 				func = params[0].trim().toUpperCase();
@@ -398,23 +399,15 @@ public class Concordia {
 	}
 
 	public static String addUserToWaitlist(String userID, String itemID, int numberOfdays) {
-		HashMap<String, Integer> userInfo;
 		String library = itemID.substring(0, 3).toUpperCase();
 		switch (library) {
 		case "CON":
-			if (waitlistBook.containsKey(itemID)) {
-				userInfo = waitlistBook.get(itemID);
-				if (userInfo.containsKey(userID)) {
-					message = "User " + userID + " already in waitlist of book with item ID " + itemID;
-					logger.info(message);
-				} else {
-					waitUserList.put(userID, numberOfdays);
-					waitlistBook.put(itemID, waitUserList);
-					message = "Added user " + userID + " to " + itemID + " waitlist Successfully !!";
-					logger.info("Wait list of Concordia Book List : ");
-					waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
-				}
-			}
+			waitUserList.put(userID, numberOfdays);
+			waitlistBook.put(itemID, waitUserList);
+			message = "Added user " + userID + " to " + itemID + " waitlist Successfully !!";
+			logger.info("Request completed successfully");
+			logger.info("Wait list of Concordia Book List : ");
+			waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
 			break;
 
 		case "MON":
@@ -432,6 +425,7 @@ public class Concordia {
 			break;
 		}
 		return message;
+
 	}
 
 	public static String returnBookFromUser(String userID, String itemID) {
@@ -464,14 +458,15 @@ public class Concordia {
 							message = "Borrow," + uID + "," + numberOfDays;
 						}
 					}
-
+					logger.info("Request completed successfully");
 				}
 
 				logger.info(" Concordia User borrow list" + userlist);
 				logger.info(" Books in Concordia Library after user request" + Books);
 
 			} else {
-				message = "InvalidBook";
+				message = "InvalidBook : Book Id is Invalid.";
+				logger.info("Request failed");
 			}
 			break;
 
@@ -534,7 +529,7 @@ public class Concordia {
 			}
 		}
 		logger.info(itemName + " details available in Concordia Library:" + result);
-
+		logger.info("Request completed successfully");
 		return result;
 	}
 

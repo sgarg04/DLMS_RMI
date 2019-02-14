@@ -26,8 +26,8 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 		operation = "";
 		switch (managerID.substring(0, 3)) {
 		case "CON":
-			Concordia.logger.info("*****Entering Concordia Server*****");
-			Concordia.logger.info("Request Type: Add an item , Request params: managerID" + managerID + ", itemID "
+			Concordia.logger.info("\n*****Entering Concordia Server*****");
+			Concordia.logger.info("Request Type: Add an item , Request params: managerID " + managerID + ", itemID "
 					+ itemID + ", itemName " + itemName + ", quantity " + quantity);
 			if (Concordia.Books.containsKey(itemID)) {
 				if (Concordia.Books.get(itemID).split(",")[0].equalsIgnoreCase(itemName)) {
@@ -51,8 +51,8 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 			break;
 
 		case "MON":
-			Montreal.logger.info("*****Entering Montreal Server*****");
-			Montreal.logger.info("Request Type: Add an item , Request params: managerID" + managerID + ", itemID "
+			Montreal.logger.info("\n*****Entering Montreal Server*****");
+			Montreal.logger.info("Request Type: Add an item , Request params: managerID " + managerID + ", itemID "
 					+ itemID + ", itemName " + itemName + ", quantity " + quantity);
 			if (Montreal.Books.containsKey(itemID)) {
 				if (Montreal.Books.get(itemID).split(",")[0].equalsIgnoreCase(itemName)) {
@@ -76,8 +76,8 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 			break;
 
 		case "MCG":
-			McGill.logger.info("*****Entering McGill Server*****");
-			McGill.logger.info("Request Type: Add an item , Request params: managerID" + managerID + ", itemID "
+			McGill.logger.info("\n*****Entering McGill Server*****");
+			McGill.logger.info("Request Type: Add an item , Request params: managerID " + managerID + ", itemID "
 					+ itemID + ", itemName " + itemName + ", quantity " + quantity);
 			if (McGill.Books.containsKey(itemID)) {
 				if (McGill.Books.get(itemID).split(",")[0].equalsIgnoreCase(itemName)) {
@@ -110,25 +110,25 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 		itemID = itemID.toUpperCase();
 		switch (managerID.substring(0, 3)) {
 		case "CON":
-			Concordia.logger.info("*****Entering Concordia Server*****");
-			Concordia.logger.info("Request Type: Remove an item , Request params: managerID" + managerID + ", itemID "
-					+ itemID +", quantity " + quantity);
+			Concordia.logger.info("\n*****Entering Concordia Server*****");
+			Concordia.logger.info("Request Type: Remove an item , Request params: managerID " + managerID + ", itemID "
+					+ itemID + ", quantity " + quantity);
 			operation = Concordia.removeItemFromLibrary(itemID, quantity);
 			Concordia.logger.info("Response returned: " + operation);
 			break;
 
 		case "MON":
-			Montreal.logger.info("*****Entering Montreal Server*****");
-			Montreal.logger.info("Request Type: Remove an item , Request params: managerID" + managerID + ", itemID "
-					+ itemID +", quantity " + quantity);
+			Montreal.logger.info("\n*****Entering Montreal Server*****");
+			Montreal.logger.info("Request Type: Remove an item , Request params: managerID " + managerID + ", itemID "
+					+ itemID + ", quantity " + quantity);
 			operation = Montreal.removeItemFromLibrary(itemID, quantity);
 			Montreal.logger.info("Response returned: " + operation);
 			break;
 
 		case "MCG":
-			McGill.logger.info("*****Entering McGill Server*****");
-			McGill.logger.info("Request Type: Remove an item , Request params: managerID" + managerID + ", itemID "
-					+ itemID +", quantity " + quantity);
+			McGill.logger.info("\n*****Entering McGill Server*****");
+			McGill.logger.info("Request Type: Remove an item , Request params: managerID " + managerID + ", itemID "
+					+ itemID + ", quantity " + quantity);
 			operation = McGill.removeItemFromLibrary(itemID, quantity);
 			McGill.logger.info("Response returned: " + operation);
 			break;
@@ -143,22 +143,22 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 
 		switch (managerID.substring(0, 3)) {
 		case "CON":
-			Concordia.logger.info("*****Entering Concordia Server*****");
-			Concordia.logger.info("Request Type: List items , Request params: managerID" + managerID);
+			Concordia.logger.info("\n*****Entering Concordia Server*****");
+			Concordia.logger.info("Request Type: List items , Request params: managerID " + managerID);
 			System.out.println(Concordia.Books);
 			bookList = Concordia.Books;
 			Concordia.logger.info("Response returned: " + bookList);
 			break;
 		case "MON":
-			Montreal.logger.info("*****Entering Montreal Server*****");
-			Montreal.logger.info("Request Type: List items , Request params: managerID" + managerID);
+			Montreal.logger.info("\n*****Entering Montreal Server*****");
+			Montreal.logger.info("Request Type: List items , Request params: managerID " + managerID);
 			System.out.println(Montreal.Books);
 			bookList = Montreal.Books;
 			Montreal.logger.info("Response returned: " + bookList);
 			break;
 		case "MCG":
-			McGill.logger.info("*****Entering McGill Server*****");
-			McGill.logger.info("Request Type: List items , Request params: managerID" + managerID);
+			McGill.logger.info("\n*****Entering McGill Server*****");
+			McGill.logger.info("Request Type: List items , Request params: managerID " + managerID);
 			System.out.println(McGill.Books);
 			bookList = McGill.Books;
 			McGill.logger.info("Response returned: " + bookList);
@@ -174,23 +174,23 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 		System.out.println(userID + "," + itemID);
 		switch (userID.substring(0, 3)) {
 		case "CON":
-			Concordia.logger.info("*****Entering Concordia Server*****");
-			Concordia.logger.info("Request Type: Add an item , Request params: userID" + userID + ", itemID "
+			Concordia.logger.info("\n*****Entering Concordia Server*****");
+			Concordia.logger.info("Request Type: Borrow an item , Request params: userID " + userID + ", itemID "
 					+ itemID + ", numberOfDays " + numberOfDays);
 			operation = Concordia.borrowBookToUser(userID, itemID, numberOfDays);
 			Concordia.logger.info("Response returned: " + operation);
 			break;
 		case "MON":
-			Montreal.logger.info("*****Entering Montreal Server*****");
-			Montreal.logger.info("Request Type: Add an item , Request params: userID" + userID + ", itemID "
+			Montreal.logger.info("\n*****Entering Montreal Server*****");
+			Montreal.logger.info("Request Type: Borrow an item , Request params: userID " + userID + ", itemID "
 					+ itemID + ", numberOfDays " + numberOfDays);
 			operation = Montreal.borrowBookToUser(userID, itemID, numberOfDays);
 			Montreal.logger.info("Response returned: " + operation);
 			break;
 		case "MCG":
-			McGill.logger.info("*****Entering McGill Server*****");
-			McGill.logger.info("Request Type: Add an item , Request params: userID" + userID + ", itemID "
-					+ itemID + ", numberOfDays " + numberOfDays);
+			McGill.logger.info("\n*****Entering McGill Server*****");
+			McGill.logger.info("Request Type: Borrow an item , Request params: userID " + userID + ", itemID " + itemID
+					+ ", numberOfDays " + numberOfDays);
 			operation = McGill.borrowBookToUser(userID, itemID, numberOfDays);
 			McGill.logger.info("Response returned: " + operation);
 			break;
@@ -199,36 +199,60 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 	}
 
 	@Override
-	public String waitList(String userID, String itemID, int numberOfdays) throws RemoteException {
+	public String waitList(String userID, String itemID, int numberOfDays) throws RemoteException {
 		operation = "";
 		itemID = itemID.toUpperCase();
 		switch (userID.substring(0, 3)) {
 		case "CON":
-			operation = Concordia.addUserToWaitlist(userID, itemID, numberOfdays);
+			Concordia.logger.info("\n*****Entering Concordia Server*****");
+			Concordia.logger.info("Request Type: Waitlist , Request params: userID " + userID + ", itemID " + itemID
+					+ ", numberOfDays " + numberOfDays);
+			operation = Concordia.addUserToWaitlist(userID, itemID, numberOfDays);
+			Concordia.logger.info("Response returned: " + operation);
 			break;
 		case "MON":
-			operation = Montreal.addUserToWaitlist(userID, itemID, numberOfdays);
+			Montreal.logger.info("\n*****Entering Montreal Server*****");
+			Montreal.logger.info("Request Type: Waitlist , Request params: userID " + userID + ", itemID " + itemID
+					+ ", numberOfDays " + numberOfDays);
+			operation = Montreal.addUserToWaitlist(userID, itemID, numberOfDays);
+			Montreal.logger.info("Response returned: " + operation);
 			break;
 		case "MCG":
-			operation = McGill.addUserToWaitlist(userID, itemID, numberOfdays);
+			McGill.logger.info("\n*****Entering McGill Server*****");
+			McGill.logger.info("Request Type: Waitlist , Request params: userID " + userID + ", itemID " + itemID
+					+ ", numberOfDays " + numberOfDays);
+			operation = McGill.addUserToWaitlist(userID, itemID, numberOfDays);
+			McGill.logger.info("Response returned: " + operation);
 			break;
 		}
 		return operation;
 	}
 
 	@Override
-	public String findItem(String userId, String itemName) {
+	public String findItem(String userID, String itemName) {
 		String booklist = new String();
 
-		switch (userId.substring(0, 3)) {
+		switch (userID.substring(0, 3)) {
 		case "CON":
-			booklist = Concordia.findItem(userId, itemName);
+			Concordia.logger.info("\n*****Entering Concordia Server*****");
+			Concordia.logger
+					.info("Request Type: Find an item , Request params: userID " + userID + ", itemName " + itemName);
+			booklist = Concordia.findItem(userID, itemName);
+			Concordia.logger.info("Response returned: " + booklist);
 			break;
 		case "MON":
-			booklist = Montreal.findItem(userId, itemName);
+			Montreal.logger.info("\n*****Entering Montreal Server*****");
+			Montreal.logger
+					.info("Request Type: Find an item , Request params: userID " + userID + ", itemName " + itemName);
+			booklist = Montreal.findItem(userID, itemName);
+			Montreal.logger.info("Response returned: " + booklist);
 			break;
 		case "MCG":
-			booklist = McGill.findItem(userId, itemName);
+			McGill.logger.info("\n*****Entering McGill Server*****");
+			McGill.logger
+					.info("Request Type: Find an item , Request params: userID " + userID + ", itemName " + itemName);
+			booklist = McGill.findItem(userID, itemName);
+			McGill.logger.info("Response returned: " + booklist);
 			break;
 		}
 		if (!booklist.equals("")) {
@@ -247,7 +271,11 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 		itemID = itemID.toUpperCase();
 		switch (userID.substring(0, 3)) {
 		case "CON":
+			Concordia.logger.info("\n*****Entering Concordia Server*****");
+			Concordia.logger
+					.info("Request Type: Return an item , Request params: userID " + userID + ", itemID " + itemID);
 			operation = Concordia.returnBookFromUser(userID, itemID);
+			Concordia.logger.info("Response returned: " + operation);
 
 			if (operation.contains("Borrow")) {
 				String uId = operation.split(",")[1];
@@ -259,8 +287,11 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 			break;
 
 		case "MON":
+			Montreal.logger.info("\n*****Entering Montreal Server*****");
+			Montreal.logger
+					.info("Request Type: Return an item , Request params: userID " + userID + ", itemID " + itemID);
 			operation = Montreal.returnBookFromUser(userID, itemID);
-
+			Montreal.logger.info("Response returned: " + operation);
 			if (operation.contains("Borrow")) {
 				String uId = operation.split(",")[1];
 				int numberOfDay = Integer.parseInt(operation.split(",")[2]);
@@ -272,8 +303,11 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 			break;
 
 		case "MCG":
+			McGill.logger.info("\n*****Entering McGill Server*****");
+			McGill.logger
+					.info("Request Type: Return an item , Request params: userID " + userID + ", itemID " + itemID);
 			operation = McGill.returnBookFromUser(userID, itemID);
-
+			McGill.logger.info("Response returned: " + operation);
 			if (operation.contains("Borrow")) {
 				String uId = operation.split(",")[1];
 				int numberOfDay = Integer.parseInt(operation.split(",")[2]);

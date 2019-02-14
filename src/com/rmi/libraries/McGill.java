@@ -136,7 +136,8 @@ public class McGill {
 				DatagramPacket request = new DatagramPacket(buffer, buffer.length);
 				aSocket.receive(request);
 				sendRequestReceived = new String(request.getData());
-				logger.info("Request received at Concordia Server");
+				logger.info("************************************");
+				logger.info("Request received at McGill Server");
 				String[] params = sendRequestReceived.split(",");
 				func = params[0].trim().toUpperCase();
 				logger.info("Request received is for " + func);
@@ -296,105 +297,95 @@ public class McGill {
 	}
 
 	public static String borrowBookToUser(String userID, String itemID, int numberOfDays) {
-			String lib = itemID.substring(0, 3).toUpperCase();
-			logger.info("->" + itemID + "," + userID);
-			switch (lib) {
-			case "MCG":
-				if (Books.containsKey(itemID)) {
-					int quantity = Integer.parseInt(Books.get(itemID).split(",")[1]);
-					logger.info("@");
-					logger.info("-->" + Books.get(itemID).split(",")[1]);
-					if (quantity > 0) {
-						logger.info("Books in MCGill Library before user request " + Books);
-						if (userID.contains("MCG")) {
-							message = setUserDetails(userID, itemID, numberOfDays);
-							logger.info(userID + "User borrowed book details after borrowing MCGill library book "
-									+ userlist.get(userID));
-						}
-						if (message.contains("Successfully")) {
-							quantity--;
-							Books.put(itemID, Books.get(itemID).split(",")[0] + "," + quantity);
-							logger.info("Request completed successfully");
-						}
-
-						logger.info("Books in MCGill Library after user request" + Books);
-					} else {
-						message = "Unavailable :  Book requested is currently not available";
-						logger.info("Request failed");
+		String lib = itemID.substring(0, 3).toUpperCase();
+		logger.info("->" + itemID + "," + userID);
+		switch (lib) {
+		case "MCG":
+			if (Books.containsKey(itemID)) {
+				int quantity = Integer.parseInt(Books.get(itemID).split(",")[1]);
+				logger.info("@");
+				logger.info("-->" + Books.get(itemID).split(",")[1]);
+				if (quantity > 0) {
+					logger.info("Books in MCGill Library before user request " + Books);
+					if (userID.contains("MCG")) {
+						message = setUserDetails(userID, itemID, numberOfDays);
+						logger.info(userID + "User borrowed book details after borrowing MCGill library book "
+								+ userlist.get(userID));
 					}
+					if (message.contains("Successfully")) {
+						quantity--;
+						Books.put(itemID, Books.get(itemID).split(",")[0] + "," + quantity);
+						logger.info("Request completed successfully");
+					}
+
+					logger.info("Books in MCGill Library after user request" + Books);
 				} else {
-					message = "InvalidBook : Book ID Provided is Invalid";
+					message = "Unavailable :  Book requested is currently not available";
 					logger.info("Request failed");
 				}
-				break;
-
-			case "MON":
-
-				if (isUserAllowedInterLibraryBorrow(lib, userID)) {
-					logger.info("User is allowed to borrow requested book from Montreal Library");
-					logger.info("***********************************************");
-
-					if (message.contains("Successfully")) {
-						sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays + ","
-								+ message;
-						sendMessage(2222);
-						message = dataReceived;
-						if (message.contains("Successfully")) {
-							message = setUserDetails(userID, itemID, numberOfDays);
-							logger.info(userID + "User borrowed book details after borrowing Montreal library book "
-									+ userlist.get(userID));
-						}
-
-					}
-				} else {
-					message = "User has already borrowed one Montreal Library book";
-				}
-				break;
-
-			case "CON":
-				if (isUserAllowedInterLibraryBorrow(lib, userID)) {
-					logger.info("User is allowed to borrow requested book from Concordia");
-					logger.info("***********************************************");
-
-					if (message.contains("Successfully")) {
-						sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays + ","
-								+ message;
-						sendMessage(1111);
-						message = dataReceived;
-						if (message.contains("Successfully")) {
-							message = setUserDetails(userID, itemID, numberOfDays);
-							logger.info(userID + "User borrowed book details after borrowing Concordia library book "
-									+ userlist.get(userID));
-						}
-
-					}
-				} else {
-					message = "User has already borrowed one Concordia Library book";
-				}
-				break;
+			} else {
+				message = "InvalidBook : Book ID Provided is Invalid";
+				logger.info("Request failed");
 			}
+			break;
+
+		case "MON":
+
+			if (isUserAllowedInterLibraryBorrow(lib, userID)) {
+				logger.info("User is allowed to borrow requested book from Montreal Library");
+				logger.info("***********************************************");
+
+				if (message.contains("Successfully")) {
+					sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays + "," + message;
+					sendMessage(2222);
+					message = dataReceived;
+					if (message.contains("Successfully")) {
+						message = setUserDetails(userID, itemID, numberOfDays);
+						logger.info(userID + "User borrowed book details after borrowing Montreal library book "
+								+ userlist.get(userID));
+					}
+
+				}
+			} else {
+				message = "User has already borrowed one Montreal Library book";
+			}
+			break;
+
+		case "CON":
+			if (isUserAllowedInterLibraryBorrow(lib, userID)) {
+				logger.info("User is allowed to borrow requested book from Concordia");
+				logger.info("***********************************************");
+
+				if (message.contains("Successfully")) {
+					sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays + "," + message;
+					sendMessage(1111);
+					message = dataReceived;
+					if (message.contains("Successfully")) {
+						message = setUserDetails(userID, itemID, numberOfDays);
+						logger.info(userID + "User borrowed book details after borrowing Concordia library book "
+								+ userlist.get(userID));
+					}
+
+				}
+			} else {
+				message = "User has already borrowed one Concordia Library book";
+			}
+			break;
+		}
 
 		return message;
 	}
 
 	public static String addUserToWaitlist(String userID, String itemID, int numberOfDays) {
-		HashMap<String, Integer> userInfo;
 		String library = itemID.substring(0, 3).toUpperCase();
 		switch (library) {
 		case "MCG":
-			if (waitlistBook.containsKey(itemID)) {
-				userInfo = waitlistBook.get(itemID);
-				if (userInfo.containsKey(userID)) {
-					message = "User " + userID + " already in waitlist of book with item ID " + itemID;
-					logger.info(message);
-				} else {
-					waitUserList.put(userID, numberOfDays);
-					waitlistBook.put(itemID, waitUserList);
-					message = "Added user " + userID + " to " + itemID + " waitlist Successfully !!";
-					logger.info("Wait list of Concordia Book List : ");
-					waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
-				}
-			}
+			waitUserList.put(userID, numberOfDays);
+			waitlistBook.put(itemID, waitUserList);
+			message = "Added user " + userID + " to " + itemID + " waitlist Successfully !!";
+			logger.info("Request completed successfully");
+			logger.info("Wait list of Concordia Book List : ");
+			waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
 			break;
 
 		case "CON":
@@ -443,7 +434,7 @@ public class McGill {
 							message = "Borrow," + uID + "," + numberOfDays;
 						}
 					}
-
+					logger.info("Request completed successfully");
 				}
 
 				logger.info(" MCGill User borrow list:\n" + userlist);
@@ -451,6 +442,7 @@ public class McGill {
 
 			} else {
 				message = "InvalidBook : Book Id is Invalid.";
+				logger.info("Request failed");
 			}
 			break;
 
@@ -516,7 +508,7 @@ public class McGill {
 			}
 		}
 		logger.info(itemName + " details available in MCGill Library:" + result);
-
+		logger.info("Request completed successfully");
 		return result;
 	}
 

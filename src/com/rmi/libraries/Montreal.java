@@ -124,13 +124,13 @@ public class Montreal {
 			String func = null;
 			String repMessage = "";
 			aSocket = new DatagramSocket(2222);
-
 			System.out.println("Server 2222 Started............");
 			while (true) {
 				byte[] buffer = new byte[1000];
 				DatagramPacket request = new DatagramPacket(buffer, buffer.length);
 				aSocket.receive(request);
 				sendRequestReceived = new String(request.getData());
+				logger.info("************************************");
 				logger.info("Request received at Montreal Server");
 				String[] params = sendRequestReceived.split(",");
 				func = params[0].trim().toUpperCase();
@@ -359,23 +359,15 @@ public class Montreal {
 	}
 
 	public static String addUserToWaitlist(String userID, String itemID, int numberOfDays) {
-		HashMap<String, Integer> userInfo;
 		String library = itemID.substring(0, 3).toUpperCase();
 		switch (library) {
 		case "MON":
-			if (waitlistBook.containsKey(itemID)) {
-				userInfo = waitlistBook.get(itemID);
-				if (userInfo.containsKey(userID)) {
-					message = "User " + userID + " already in waitlist of book with item ID " + itemID;
-					logger.info(message);
-				} else {
-					waitUserList.put(userID, numberOfDays);
-					waitlistBook.put(itemID, waitUserList);
-					message = "User Successfully added to Montreal waitlist";
-					logger.info("Wait list of Montreal Book List : ");
-					waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
-				}
-			}
+			waitUserList.put(userID, numberOfDays);
+			waitlistBook.put(itemID, waitUserList);
+			message = "Added user " + userID + " to " + itemID + " waitlist Successfully !!";
+			logger.info("Request completed successfully");
+			logger.info("Wait list of Montreal Book List : ");
+			waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
 			break;
 
 		case "CON":
@@ -424,13 +416,14 @@ public class Montreal {
 							message = "Borrow," + uID + "," + numberOfDays;
 						}
 					}
-
+					logger.info("Request completed successfully");
 				}
 				logger.info("Montreal User borrow list: \n" + userlist);
 				logger.info("Books in Montreal Library after user request :" + Books);
 
 			} else {
 				message = "InvalidBook : Book Id is Invalid.";
+				logger.info("Request failed");
 			}
 			break;
 
@@ -496,7 +489,7 @@ public class Montreal {
 			}
 		}
 		logger.info(itemName + " details available in Montreal Library:" + result);
-
+		logger.info("Request completed successfully");
 		return result;
 	}
 
