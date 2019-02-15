@@ -47,22 +47,10 @@ public class Concordia {
 		Thread thread = new Thread(task);
 		thread.start();
 		ActionService conStub = new ActionServiceImpl();
-		logger = Logger.getLogger(Concordia.class.getName());
-		logger.setUseParentHandlers(false);
+		
 		logger.info("Concordia server started");
 		try {
-			try {
-				// This block configure the logger with handler and formatter
-				fileHandler = new FileHandler(
-						"Logs/Server/Concordia.log");
-				logger.addHandler(fileHandler);
-				SimpleFormatter formatter = new SimpleFormatter();
-				fileHandler.setFormatter(formatter);
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			
 			// special exception handler for registry creation
 			LocateRegistry.createRegistry(4444);
 			logger.info("Concordia registry created.");
@@ -97,6 +85,19 @@ public class Concordia {
 			byte[] buffer = new byte[1000];
 			DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
 			aSocket.receive(reply);
+			logger = Logger.getLogger(Concordia.class.getName());
+			logger.setUseParentHandlers(false);try {
+				// This block configure the logger with handler and formatter
+				fileHandler = new FileHandler(
+						"Logs/Server/Concordia.log");
+				logger.addHandler(fileHandler);
+				SimpleFormatter formatter = new SimpleFormatter();
+				fileHandler.setFormatter(formatter);
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			dataReceived = null;
 			dataReceived = new String(reply.getData()).trim();
 
@@ -117,6 +118,20 @@ public class Concordia {
 
 	private static void receive() {
 		DatagramSocket aSocket = null;
+		logger = Logger.getLogger(Concordia.class.getName());
+		logger.setUseParentHandlers(false);
+		try {
+			// This block configure the logger with handler and formatter
+			fileHandler = new FileHandler(
+					"Logs/Server/Concordia.log");
+			logger.addHandler(fileHandler);
+			SimpleFormatter formatter = new SimpleFormatter();
+			fileHandler.setFormatter(formatter);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		try {
 			String func = null;
 			String repMessage = "";
@@ -246,7 +261,9 @@ public class Concordia {
 			isUserAllowed = true;
 		}
 		if (isUserAllowed)
-			message = "Successfully,"+key;
+			message = "Successfully";
+		else
+			message = key;
 		return isUserAllowed;
 	}
 
@@ -438,7 +455,7 @@ public class Concordia {
 				waitlistBook.put(itemID, waitUList);
 			}
 
-			message = userID + " added to " + itemID + " waitlist Successfully !!. You are at position - "+position+" in the Queue.";
+			message = userID + " added to " + itemID + " waitlist Successfully !!. You are at position  "+position+" in the Queue.";
 			logger.info("Request completed successfully.\n");
 			logger.info(message);
 			logger.info("Wait list of Concordia Book  After user request:\n");
@@ -584,7 +601,7 @@ public class Concordia {
 					String keyValue = itemName + "," + newQuantity;
 					conBooks.put(itemID, keyValue);
 					operation = "Book's quantity decreased by " + quantity
-							+ " Successfully  from the avaialable list! ";
+							+ " Successfully  from the available list! ";
 					logger.info("After removal:\n" + Books.toString() + "\n");
 					logger.info("Request completed successfully");
 				} else if (quantity == -1) {

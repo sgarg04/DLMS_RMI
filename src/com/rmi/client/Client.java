@@ -20,9 +20,7 @@ public class Client {
 	static char operatorRole;
 	static int rmiPort, quantity;
 	static boolean isIDCorrect, isItemIdCorrect;
-	static Logger logger = Logger.getLogger(Client.class.getName());
-	static private FileHandler fileHandler;
-	static private SimpleFormatter formatterTxt;
+
 	static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 	static ActionService serverRef;
 	static boolean isValidManagerFlag;
@@ -44,7 +42,6 @@ public class Client {
 		serverRef = (ActionService) Naming.lookup(registryURL);
 	}
 
-	
 	private static boolean isOperatorIdCorrect(String operatorID) {
 		isIDCorrect = false;
 
@@ -101,17 +98,20 @@ public class Client {
 		return isItemIdCorrect;
 	}
 
-	private static void loggingOperator(String operator, String operatorID) throws SecurityException, IOException {
-		fileHandler = new FileHandler("Logs/Client/" + operator
-				+ "/" + operatorID + ".log");
+	private static Logger loggingOperator(String operator, String operatorID, Logger logger)
+			throws SecurityException, IOException {
 
-		formatterTxt = new SimpleFormatter();
-		fileHandler.setFormatter(formatterTxt);
+		FileHandler fileHandler = new FileHandler("Logs/Client/" + operator + "/" + operatorID + ".log");
 		logger.addHandler(fileHandler);
 		logger.setUseParentHandlers(false);
+
+		SimpleFormatter formatterTxt = new SimpleFormatter();
+		fileHandler.setFormatter(formatterTxt);
+
+		return logger;
 	}
 
-	public static void managerOperation(String managerID) throws IOException {
+	public static void managerOperation(String managerID, Logger logger) throws IOException {
 		System.out.println("\nHello Manager,");
 		String proceedM = "yes";
 		while (proceedM.equalsIgnoreCase("yes")) {
@@ -144,7 +144,8 @@ public class Client {
 						break;
 					}
 					if (itemName.trim().isEmpty()) {
-						System.out.println("Invalid Book Name provided. Contains only contains whitespace (ie. spaces, tabs or line breaks)\n");
+						System.out.println(
+								"Invalid Book Name provided. Contains only contains whitespace (ie. spaces, tabs or line breaks)\n");
 						break;
 					}
 
@@ -164,14 +165,15 @@ public class Client {
 						logger.info("***** Manager with manager ID " + managerID
 								+ "initiated an add book request for book id \n" + itemId + " book name " + itemName
 								+ " quantity " + quantity + " in " + serverName + " library");
-						logger.info("***** Entering addItem operation ****");
+						logger.info("**** Entering addItem operation ***");
 						String result = serverRef.addItem(operatorID, itemId, itemName, quantity);
 						logger.info("Response received from server : " + result);
 						System.out.println("\n" + result);
 						loop = false;
 					} else {
 						logger.log(Level.SEVERE, "\nInvalid quantity entered. Entered book's quantity is " + quantity);
-						System.out.println("\nPlease enter a valid quantity. It cannot be less than or equal to zero.\n");
+						System.out
+								.println("\nPlease enter a valid quantity. It cannot be less than or equal to zero.\n");
 						break;
 					}
 				}
@@ -211,48 +213,49 @@ public class Client {
 						logger.info("***** Manager with manager ID " + managerID
 								+ "initiated an remove book request for book id " + itemId + " in " + serverName
 								+ " library");
-						logger.info("***** Entering removeItem operation to remove the entire book ****");
+						logger.info("**** Entering removeItem operation to remove the entire book ***");
 						output = serverRef.removeItem(operatorID, itemId, quantity);
 						logger.info("Response received from server : " + output);
 						System.out.println(output);
 						correctchoice = false;
 					} else if (choice == 2) {
-						
-							System.out.println("\nEnter the quantity by which the book's quantity needs to be reduced [Enter -1 to remove the book itself]:");
-							try {
-								quantity = Integer.parseInt(reader.readLine());
-							} catch (NumberFormatException ex) {
-								System.out.println("\nQuantity should be a valid Digit.\n");
-								break;
-							}
-							if (quantity > 0 || quantity == -1) {
-								logger.info("***** Manager with manager ID " + managerID
-										+ "initiated an reduce quantity of book request for book id " + itemId
-										+ " with quantity " + quantity + " in " + serverName + " library");
-								logger.info("***** Entering removeItem operation to remove the entire book ****");
-								output = serverRef.removeItem(operatorID, itemId, quantity);
-								logger.info("Response received from server : " + output);
-								if (!output.contains("Invalid")) {
-									System.out.println("\n" + output+"\n");
-									logger.log(Level.SEVERE,output);
-									
-									correctchoice = false;
-								} else  {
-									logger.log(Level.SEVERE, output+"\n");
-									System.out.println(output);
-									
-									correctchoice = false;
-								} 
 
-							} else if(quantity<-1|| quantity==0){
-								logger.log(Level.SEVERE, "Invalid quantity, Entered quantity : " + quantity);
-								System.out.println(
-										"\nPlease enter a valid quantity. It can not be less than or equals to zero \n");
-								
+						System.out.println(
+								"\nEnter the quantity by which the book's quantity needs to be reduced [Enter -1 to remove the book itself]:");
+						try {
+							quantity = Integer.parseInt(reader.readLine());
+						} catch (NumberFormatException ex) {
+							System.out.println("\nQuantity should be a valid Digit.\n");
+							break;
+						}
+						if (quantity > 0 || quantity == -1) {
+							logger.info("***** Manager with manager ID " + managerID
+									+ "initiated an reduce quantity of book request for book id " + itemId
+									+ " with quantity " + quantity + " in " + serverName + " library");
+							logger.info("**** Entering removeItem operation to remove the entire book ***");
+							output = serverRef.removeItem(operatorID, itemId, quantity);
+							logger.info("Response received from server : " + output);
+							if (!output.contains("Invalid")) {
+								System.out.println("\n" + output + "\n");
+								logger.log(Level.SEVERE, output);
+
 								correctchoice = false;
+							} else {
+								logger.log(Level.SEVERE, output + "\n");
+								System.out.println(output);
 
+								correctchoice = false;
 							}
-						
+
+						} else if (quantity < -1 || quantity == 0) {
+							logger.log(Level.SEVERE, "Invalid quantity, Entered quantity : " + quantity);
+							System.out.println(
+									"\nPlease enter a valid quantity. It can not be less than or equals to zero \n");
+
+							correctchoice = false;
+
+						}
+
 					} else
 						System.out.println("\nSorry, it was an incorrect choice. Please enter a correct choice.");
 				}
@@ -262,7 +265,7 @@ public class Client {
 			case "3":
 				logger.info("Manager with manager id " + managerID + "opted to list all the books in the library");
 				HashMap<String, String> bookList = new HashMap<String, String>();
-				logger.info("***** Entering listItemAvailability operation to list all the books in library ****");
+				logger.info("**** Entering listItemAvailability operation to list all the books in library ***");
 				bookList = serverRef.listItemAvailability(operatorID);
 				logger.info("Response received from server : " + bookList);
 				System.out.println("\nBooks Available in Library are : \n");
@@ -288,7 +291,7 @@ public class Client {
 
 	}
 
-	public static void userOperation(String userID) throws IOException {
+	public static void userOperation(String userID, Logger logger) throws IOException {
 		System.out.println("\nHello User,");
 		String proceeduser = "yes";
 		String operation = "";
@@ -319,13 +322,15 @@ public class Client {
 					try {
 						numberOfDays = Integer.parseInt(reader.readLine());
 					} catch (NumberFormatException ex) {
-						System.out.println("\nQuantity should be a valid Digit.\n");System.err.flush();;
+						System.out.println("\nQuantity should be a valid Digit.\n");
+						System.err.flush();
+						;
 						break;
 					}
 					if (numberOfDays > 0) {
 						logger.info("***** User with user ID " + userID + "initiated a borrow request for a book "
 								+ itemId + "in " + serverName + " library");
-						logger.info("***** Entering borrowItem operation ****");
+						logger.info("**** Entering borrowItem operation ***");
 						operation = serverRef.borrowItem(userID, itemId, numberOfDays);
 						if (operation.contains("Unavailable")) {
 							System.out.println("\nBook with item ID: " + itemId + " is unavailable!");
@@ -337,7 +342,7 @@ public class Client {
 								logger.info("***** User with user ID " + userID
 										+ "initiated a waitlist request for a book " + itemId + "in " + serverName
 										+ "library for number of days: " + numberOfDays);
-								logger.info("***** Entering waitList operation ****");
+								logger.info("**** Entering waitList operation ***");
 								operation = serverRef.waitList(userID, itemId, numberOfDays);
 								logger.info("Response received from server : " + operation);
 								System.out.println("\n" + operation);
@@ -345,11 +350,10 @@ public class Client {
 								System.out.println("\nAlright! We did not add you in wait list.\n");
 								logger.info("User did not opt to enter a waitlist");
 							}
-						} 
-						else
-						{
+						} else {
 							logger.info("Response received from server : " + operation);
-							System.out.println("\n" + operation);System.err.flush();
+							System.out.println("\n" + operation);
+							System.err.flush();
 						}
 						loop = false;
 					} else {
@@ -370,12 +374,13 @@ public class Client {
 					break;
 				}
 				if (itemName.trim().isEmpty()) {
-					System.out.println("Invalid Book Name provided. Contains only contains whitespace (ie. spaces, tabs or line breaks)\n");
+					System.out.println(
+							"Invalid Book Name provided. Contains only contains whitespace (ie. spaces, tabs or line breaks)\n");
 					break;
 				}
 				String bookList = "";
 				logger.info("User with user id " + userID + "opted to find a book with name as " + itemName);
-				logger.info("***** Entering findItem operation ****");
+				logger.info("**** Entering findItem operation ***");
 				bookList = serverRef.findItem(userID, itemName);
 				logger.info("Response received from server : " + bookList);
 				if (!bookList.equals("")) {
@@ -406,7 +411,7 @@ public class Client {
 								"The given book id has an invalid format. Please try again with a valid book id.\n");
 				}
 				logger.info("User with user id " + userID + "opted to return a book with item id " + itemId);
-				logger.info("***** Entering returnItem operation ****");
+				logger.info("**** Entering returnItem operation ***");
 				operation = serverRef.returnItem(userID, itemId);
 				System.out.println(operation);
 				logger.info("Response received from server : " + operation);
@@ -438,7 +443,7 @@ public class Client {
 			System.setSecurityManager(new SecurityManager());
 
 			while (!stopRunning) {
-				System.out.println("\n** Welcome to Library **");
+				System.out.println("\n* Welcome to Library *");
 				System.out.println("\n(At any point of time type 'Quit' to exit)");
 				System.out.println("\nPlease enter a valid User Id or Manager Id : ");
 				operatorID = (reader.readLine()).toUpperCase();
@@ -461,16 +466,18 @@ public class Client {
 						try {
 							switch (operatorRole) {
 							case 'M':
-
-								loggingOperator("Manager", operatorID);
-								managerOperation(operatorID);
+								Logger managerlogger = Logger.getLogger(operatorID);
+					
+								managerlogger = loggingOperator("Manager", operatorID, managerlogger);
+								managerOperation(operatorID, managerlogger);
 
 								break;
 
 							case 'U':
-
-								loggingOperator("User", operatorID);
-								userOperation(operatorID);
+								Logger userlogger = Logger.getLogger(operatorID);
+							
+								userlogger = loggingOperator("User", operatorID, userlogger);
+								userOperation(operatorID, userlogger);
 
 								break;
 							}

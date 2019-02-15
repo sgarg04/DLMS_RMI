@@ -256,7 +256,9 @@ public class McGill {
 			isUserAllowed = true;
 		}
 		if (isUserAllowed)
-			message = "Successfully,"+key;
+			message = "Successfully";
+		else
+			message = key;
 		return isUserAllowed;
 	}
 
@@ -448,7 +450,7 @@ public class McGill {
 				waitlistBook.put(itemID, waitUList);
 			}
 
-			message = userID + " added to " + itemID + " waitlist Successfully !!. You are at position - "+position+" in the Queue.";
+			message = userID + " added to " + itemID + " waitlist Successfully !!. You are at position  "+position+" in the Queue.";
 			logger.info("Request completed successfully.\n");
 			logger.info(message);
 			logger.info("Wait list of McGill Book  After :\n");
@@ -594,7 +596,7 @@ public class McGill {
 					String keyValue = itemName + "," + newQuantity;
 					conBooks.put(itemID, keyValue);
 					operation = "Book's quantity decreased by " + quantity
-							+ " Successfully  from the avaialable list! ";
+							+ " Successfully  from the available list! ";
 					logger.info("After removal:\n" + Books.toString() + "\n");
 					logger.info("Request completed successfully");
 				} else if (quantity == -1) {

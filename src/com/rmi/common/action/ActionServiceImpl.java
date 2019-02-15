@@ -36,6 +36,7 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 			Concordia.logger.info("\n*****Entering Concordia Server*****\n");
 			Concordia.logger.info("Request Type: Add an item , Request params:\n managerID " + managerID + ", itemID "
 					+ itemID + ", itemName " + itemName + ", quantity " + quantity);
+			
 			if (Concordia.Books.containsKey(itemID)) {
 				if (Concordia.Books.get(itemID).split(",")[0].equalsIgnoreCase(itemName)) {
 					oldQuantity = Integer.parseInt(Concordia.Books.get(itemID).split(",")[1]);

@@ -1,40 +1,40 @@
-Feb 16, 2019 1:03:14 AM com.rmi.libraries.McGill startMcGillServer
+Feb 16, 2019 4:12:41 AM com.rmi.libraries.McGill startMcGillServer
 INFO: McGill registry created.
-Feb 16, 2019 1:03:14 AM com.rmi.libraries.McGill startMcGillServer
+Feb 16, 2019 4:12:41 AM com.rmi.libraries.McGill startMcGillServer
 INFO: McGill Server bound in registry 
 
-Feb 16, 2019 1:03:14 AM com.rmi.libraries.McGill startMcGillServer
+Feb 16, 2019 4:12:41 AM com.rmi.libraries.McGill startMcGillServer
 INFO: Setting Library Details 
 
-Feb 16, 2019 1:03:14 AM com.rmi.libraries.McGill setLibraryDetails
+Feb 16, 2019 4:12:41 AM com.rmi.libraries.McGill setLibraryDetails
 INFO: Books registered while initialization
 
-Feb 16, 2019 1:03:14 AM com.rmi.libraries.McGill lambda$1
+Feb 16, 2019 4:12:41 AM com.rmi.libraries.McGill lambda$1
 INFO: **  MCG4444 Data Structure 8
 
-Feb 16, 2019 1:03:14 AM com.rmi.libraries.McGill lambda$1
+Feb 16, 2019 4:12:41 AM com.rmi.libraries.McGill lambda$1
 INFO: **  MCG1111 Compiler Design 5
 
-Feb 16, 2019 1:03:14 AM com.rmi.libraries.McGill lambda$1
+Feb 16, 2019 4:12:41 AM com.rmi.libraries.McGill lambda$1
 INFO: **  MCG2222 JAVA and J2EE 1
 
-Feb 16, 2019 1:03:14 AM com.rmi.libraries.McGill lambda$1
+Feb 16, 2019 4:12:41 AM com.rmi.libraries.McGill lambda$1
 INFO: **  MCG3333 Computer Organization 4
 
-Feb 16, 2019 1:03:14 AM com.rmi.libraries.McGill setLibraryDetails
+Feb 16, 2019 4:12:41 AM com.rmi.libraries.McGill setLibraryDetails
 INFO: User registered while initialization
 
-Feb 16, 2019 1:03:14 AM com.rmi.libraries.McGill lambda$2
+Feb 16, 2019 4:12:41 AM com.rmi.libraries.McGill lambda$2
 INFO: **  MCGU1122 {CON2222=10, MCG1111=12, MCG2222=23, MON2222=18, MCG4592=23}
 
-Feb 16, 2019 1:03:14 AM com.rmi.libraries.McGill lambda$2
+Feb 16, 2019 4:12:41 AM com.rmi.libraries.McGill lambda$2
 INFO: **  MCGU2233 {}
 
-Feb 16, 2019 1:03:14 AM com.rmi.libraries.McGill lambda$2
+Feb 16, 2019 4:12:41 AM com.rmi.libraries.McGill lambda$2
 INFO: **  MCGU3344 {}
 
-Feb 16, 2019 1:03:14 AM com.rmi.libraries.McGill setLibraryDetails
+Feb 16, 2019 4:12:41 AM com.rmi.libraries.McGill setLibraryDetails
 INFO: Books WaitList registered while initialization
 
-Feb 16, 2019 1:03:14 AM com.rmi.libraries.McGill setLibraryDetails
+Feb 16, 2019 4:12:41 AM com.rmi.libraries.McGill setLibraryDetails
 INFO: NO Records

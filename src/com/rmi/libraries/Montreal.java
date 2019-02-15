@@ -443,7 +443,7 @@ public class Montreal {
 				waitlistBook.put(itemID, waitUList);
 			}
 
-			message = userID + " added to " + itemID + " waitlist Successfully !!. You are at position - "+position+" in the Queue.";
+			message = userID + " added to " + itemID + " waitlist Successfully !!. You are at position  "+position+" in the Queue.";
 			logger.info("Request completed successfully.\n");
 			logger.info(message);
 			logger.info("Wait list of Montreal Book  After :\n");
@@ -589,7 +589,7 @@ public class Montreal {
 					String keyValue = itemName + "," + newQuantity;
 					conBooks.put(itemID, keyValue);
 					operation = "Book's quantity decreased by " + quantity
-							+ " Successfully  from the avaialable list! ";
+							+ " Successfully  from the available list! ";
 					logger.info("After removal:\n" + Books.toString() + "\n");
 					logger.info("Request completed successfully");
 				} else if (quantity == -1) {

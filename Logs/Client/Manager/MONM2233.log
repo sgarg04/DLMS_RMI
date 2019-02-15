@@ -1,13 +1,18 @@
-Feb 10, 2019 2:14:52 AM com.rmi.client.Client managerOperation
+Feb 16, 2019 4:07:52 AM com.rmi.client.Client managerOperation
+INFO: Manager with manager id MONM2233opted to list all the books in the library
+Feb 16, 2019 4:07:52 AM com.rmi.client.Client managerOperation
+INFO: **** Entering listItemAvailability operation to list all the books in library ***
+Feb 16, 2019 4:07:52 AM com.rmi.client.Client managerOperation
+INFO: Response received from server : {MON1111=Computer Networks,9, MON2222=Computer Organization,0, MON3333=Discrete Mathmatical Structure,1, MON4444=Data Structure,8}
+Feb 16, 2019 4:08:02 AM com.rmi.client.Client managerOperation
 INFO: Manager with manager id MONM2233opted to add a book
-Feb 10, 2019 2:15:02 AM com.rmi.client.Client managerOperation
-SEVERE: 
-The entered book id has an invalid format
-
-Feb 10, 2019 2:15:30 AM com.rmi.client.Client managerOperation
-INFO: ***** Manager with manager ID MONM2233initiated an add book request for book id 
-mon6756 book name gt quantity 12 in MON library
-Feb 10, 2019 2:15:30 AM com.rmi.client.Client managerOperation
-INFO: ***** Entering addItem operation ****
-Feb 10, 2019 2:15:30 AM com.rmi.client.Client managerOperation
-INFO: Response received from server : Item MON6756 added to the library
+Feb 16, 2019 4:08:28 AM com.rmi.client.Client managerOperation
+INFO: Manager with manager id MONM2233opted to delete/reduce a book
+Feb 16, 2019 4:08:35 AM com.rmi.client.Client managerOperation
+INFO: ***** Manager with manager ID MONM2233initiated an reduce quantity of book request for book id MON3333 with quantity 1 in MON library
+Feb 16, 2019 4:08:35 AM com.rmi.client.Client managerOperation
+INFO: **** Entering removeItem operation to remove the entire book ***
+Feb 16, 2019 4:08:35 AM com.rmi.client.Client managerOperation
+INFO: Response received from server : Book's quantity decreased by 1 Successfully  from the available list! 
+Feb 16, 2019 4:08:35 AM com.rmi.client.Client managerOperation
+SEVERE: Book's quantity decreased by 1 Successfully  from the available list! 

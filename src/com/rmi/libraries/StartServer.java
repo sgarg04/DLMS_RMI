@@ -6,6 +6,7 @@ public class StartServer {
 		Concordia.startConcordiaServer();
 		Montreal.startMontrealServer();
 		McGill.startMcGillServer();
+		
 	}
 
 }
