@@ -7,14 +7,16 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-
 import com.rmi.common.action.ActionService;
 import com.rmi.common.action.ActionServiceImpl;
 
@@ -22,15 +24,15 @@ public class Concordia {
 
 	public static HashMap<String, String> Books = new HashMap<String, String>();
 	public static HashMap<String, HashMap<String, Integer>> userlist = new HashMap<String, HashMap<String, Integer>>();
-
-	public static HashMap<String, Integer> waitUserList = new HashMap<String, Integer>();
-	public static HashMap<String, HashMap<String, Integer>> waitlistBook = new HashMap<String, HashMap<String, Integer>>();
+	public static ArrayList<String> managerUserList = new ArrayList<String>();
+	public static LinkedHashMap<String, Integer> waitUserList = new LinkedHashMap<String, Integer>();
+	public static HashMap<String, LinkedHashMap<String, Integer>> waitlistBook = new HashMap<String, LinkedHashMap<String, Integer>>();
 
 	private static String sendRequestMessage;
 	private static String sendRequestReceived;
 	private static String dataReceived;
 	private static String message;
-	private static Logger logger;
+	public static Logger logger;
 	static FileHandler fileHandler;
 
 	public Concordia() throws RemoteException {
@@ -52,7 +54,7 @@ public class Concordia {
 			try {
 				// This block configure the logger with handler and formatter
 				fileHandler = new FileHandler(
-						"/Users/SGarg/Shresthi/Winter 2019/DS-COMP 6231/assignment/DLMS_DS2019/DistributedLibraryManagementSystem/Logs/Server/Concordia.log");
+						"C:\\Users\\mchaturv\\git\\DLMS_RMI_v2\\DLMS_RMI\\Logs\\Server\\Concordia.log");
 				logger.addHandler(fileHandler);
 				SimpleFormatter formatter = new SimpleFormatter();
 				fileHandler.setFormatter(formatter);
@@ -69,7 +71,6 @@ public class Concordia {
 			// do nothing, error means registry already exists
 			System.out.println("Concordia registry already exists.");
 		}
-
 		// Instantiate Concordia Server and bind this object instance to the name
 		// "Concordia Server"
 		Naming.rebind("rmi://localhost:4444/CON", conStub);
@@ -157,10 +158,14 @@ public class Concordia {
 					break;
 				case "REMOVE":
 					itemID = params[1].trim();
-					removeItemFromuserlist(itemID);
+					removeItemFromUserlist(itemID);
+					break;
+				case "CHECKWAITLIST":
+					userID = params[1].trim();
+					itemID = params[2].trim();
+					repMessage = checkAndRemoveWaitList(userID, itemID);
 					break;
 				}
-
 				buffer = repMessage.getBytes();
 				DatagramPacket reply = new DatagramPacket(buffer, buffer.length, request.getAddress(),
 						request.getPort());
@@ -178,41 +183,51 @@ public class Concordia {
 		}
 	}
 
-//	public static boolean isUserInWaitlistForSameItemID(String userID) {
-//		boolean isUserInWaitList = false;
-//		HashMap<String, Integer> waitUserInfo;
-//		int count;
-//		if (!waitlistBook.isEmpty()) {
-//			System.out.println("waitlistBook" + waitlistBook);
-//			count = 0;
-//			Iterator<Entry<String, HashMap<String, Integer>>> waitListIterator = waitlistBook.entrySet().iterator();
-//			while (waitListIterator.hasNext()) {
-//				count = 0;
-//				Entry<String, HashMap<String, Integer>> thisEntry = waitListIterator.next();
-//				waitUserInfo = thisEntry.getValue();
-//				System.out.println("waitUserInfo " + waitUserInfo);
-//				if (waitUserInfo.containsKey(userID)) {
-//					count++;
-//					System.out.println("waitUserInfo : " + waitUserInfo + "userID : " + userID);
-//					System.out.println("count :" + count);
-//				}
-//			}
-//			isUserInWaitList = count == 1 ? true : false;
-//		} else {
-//			isUserInWaitList = false;
-//
-//		}
-//		System.out.println("isUserWaitListValid" + isUserInWaitList);
-//		return isUserInWaitList;
-//	}
+	private static synchronized void setLibraryDetails() {
+
+		String[] managerIDs = { "CONM1122", "CONM2233", "CONM3344", "CONM4455" };
+		Collections.addAll(managerUserList, managerIDs);
+
+		Books.put("CON1111", "Compiler Design,4");
+		Books.put("CON2222", "Discrete Mathmatical Structure,0");
+		Books.put("CON3333", "Graph Theory,2");
+		Books.put("CON4444", "Data Structure,8");
+
+		HashMap<String, Integer> temp = new HashMap<String, Integer>();
+		temp.put("CON1111", 12);
+		temp.put("CON2222", 23);
+		temp.put("MCG2222", 18);
+		temp.put("MON2222", 18);
+
+		userlist = new LinkedHashMap<String, HashMap<String, Integer>>();
+		userlist.put("CONU1122", temp);
+		HashMap<String, Integer> temp1 = new HashMap<String, Integer>();
+		userlist.put("CONU2233", temp1);
+		HashMap<String, Integer> temp2 = new HashMap<String, Integer>();
+		userlist.put("CONU3344", temp2);
+
+		logger.info(" ** Books registered while initialization\n");
+		Books.forEach((k, v) -> logger.info(("**  " + k + " " + v.split(",")[0] + " " + v.split(",")[1] + "\n")));
+		logger.info(" ** User registered while initialization\n");
+		userlist.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
+
+		LinkedHashMap<String, Integer> waitUserList1 = new LinkedHashMap<String, Integer>();
+
+		waitUserList1.put("MONU1122", 17);
+		waitUserList1.put("CONU2233", 19);
+		waitlistBook.put("CON2222", waitUserList1);
+
+		logger.info(" ** Books WaitList registered while initialization\n");
+		waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
+
+	}
 
 	public static boolean isUserAllowedInterLibraryBorrow(String library, String userID) {
 
 		String key;
 		HashMap<String, Integer> userinfo;
-		logger.info("Checking User Info for accessibilty for requested book");
-		Boolean isUserAllowed = false;
-		int count = 0;
+		logger.info("Checking User Info for accessibilty for requested book\n");
+		boolean isUserAllowed = true;
 		userinfo = userlist.get(userID);
 		if (!userinfo.isEmpty()) {
 			Iterator<Entry<String, Integer>> iterator = userinfo.entrySet().iterator();
@@ -220,10 +235,9 @@ public class Concordia {
 				Entry<String, Integer> thisEntry = iterator.next();
 				key = thisEntry.getKey();
 				if (key.substring(0, 3).equalsIgnoreCase(library)) {
-					count++;
+					isUserAllowed = false;
 				}
 			}
-			isUserAllowed = count == 1 ? false : true;
 		} else {
 			isUserAllowed = true;
 		}
@@ -232,200 +246,206 @@ public class Concordia {
 		return isUserAllowed;
 	}
 
-//	private static boolean isUserAllowedInterLibraryBorrow(String library, String userID, String itemID) {
-//		logger.info("Checking User Info for accessibilty for requested book");
-//		boolean isUserAllowed = false;
-//		
-//
-//		isUserAllowed = (isUserListValid && isUserWaitListValid) ? true : false;
-//
-//		if (isUserAllowed)
-//			message = "Successfully";
-//
-//		System.out.println("isUserAllowed " + isUserAllowed);
-//		return isUserAllowed;
-//	}
-
 	private static String setUserDetails(String userID, String itemID, int numberOfDays) {
 		HashMap<String, Integer> temp = new HashMap<String, Integer>();
-		if (userlist.containsKey(userID)) {
-			temp = userlist.get(userID);
-			if (!temp.containsKey(itemID) || temp.isEmpty() || temp == null) {
-				temp.put(itemID, numberOfDays);
-				userlist.put(userID, temp);
-				logger.info("Book with book id " + itemID + " successfully borrowed by user " + userID
-						+ ". Also, added the book to user's borrowed list");
-				return "Book with book id " + itemID + " successfully borrowed by user " + userID
-						+ ". Also, added the book to user's borrowed list";
 
-			} else {
-				System.err.println("Item already available in user's burrowed list");
-				logger.info("Item already available in user's burrowed list");
-				return "Requested book already exists in user's borrowed list. Cannot borrow the same item again";
-			}
-
+		temp = userlist.get(userID);
+		if (!temp.containsKey(itemID) || temp.isEmpty() || temp == null) {
+			temp.put(itemID, numberOfDays);
+			userlist.put(userID, temp);
+			logger.info("Book with book id " + itemID + " Successfully borrowed by user " + userID
+					+ ". Added the book to user's borrowed list\n");
+			return "Book with book id " + itemID + " Successfully borrowed by user " + userID + ".";
 		} else {
-			logger.info("User with User ID : " + userID + " does not exist\n");
-			return "User with User ID : " + userID + " does not exist.";
+			logger.info("Item already available in user's burrowed list");
+			return "Requested book already exists in user's borrowed list. Cannot borrow the same book again";
 		}
 
 	}
 
 	private static String updateUserBookDetails(String userID, String itemID) {
 		HashMap<String, Integer> temp = new HashMap<String, Integer>();
-		if (userlist.containsKey(userID)) {
-			temp = userlist.get(userID);
-			if (temp.containsKey(itemID)) {
-				temp.remove(itemID);
-				userlist.put(userID, temp);
-				logger.info(" Item returned Successfully to the Library and removed from user borrowed list.");
-				return "Item returned Successfully to the Library and removed from user borrowed list.";
-			} else {
-				logger.info(" Item with Item ID : " + itemID + " does not exist in User's borrowed List of books\n");
-				return "BookNotPresent : Item with Item ID : " + itemID
-						+ " does not exist in User's borrowed List of books.";
-			}
+
+		temp = userlist.get(userID);
+		if (temp.containsKey(itemID)) {
+			temp.remove(itemID);
+			userlist.put(userID, temp);
+
+			logger.info(" Item returned Successfully to the Library and removed from user borrowed list.\n");
+			return "Item returned Successfully to the Library and removed from user borrowed list.";
 		} else {
-			logger.info("User with User ID : " + userID + " does not exist\n");
-			return "User with User ID : " + userID + " does not exist.";
+			logger.info(" Item with Item ID : " + itemID + " does not exist in User's borrowed List of books\n");
+			return "BookNotPresent : Item with Item ID : " + itemID
+					+ " does not exist in User's borrowed List of books.";
 		}
-
-	}
-
-	private static synchronized void setLibraryDetails() {
-
-		Books.put("CON7878", "Complier Design,4");
-		Books.put("CON2565", "Discrete Mathmatical Structure,0");
-
-		HashMap<String, Integer> temp = new HashMap<String, Integer>();
-		temp.put("CON7878", 12);
-		temp.put("CON2565", 23);
-		temp.put("MCG4592", 18);
-
-		userlist = new HashMap<String, HashMap<String, Integer>>();
-		userlist.put("CONU1234", temp);
-		HashMap<String, Integer> temp1 = new HashMap<String, Integer>();
-		userlist.put("CONU4774", temp1);
-
-		logger.info(" ** Books registered while initialization\n");
-		Books.forEach((k, v) -> logger.info(("**  " + k + " " + v.split(",")[0] + " " + v.split(",")[1] + "\n")));
-		logger.info(" ** User registered while initialization\n");
-		userlist.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
-
-		HashMap<String, Integer> waitUserList1 = new HashMap<String, Integer>();
-
-		waitUserList1.put("MONU7474", 17);
-		waitlistBook.put("CON2565", waitUserList1);
-
-		logger.info(" ** Books WaitList registered while initialization\n");
-		waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
 
 	}
 
 	public static String borrowBookToUser(String userID, String itemID, int numberOfDays) {
 		String lib = itemID.substring(0, 3).toUpperCase();
+		HashMap<String, Integer> userInfo = new HashMap<String, Integer>();
+		HashMap<String, Integer> temp = new HashMap<String, Integer>();
 		switch (lib) {
 		case "CON":
 			if (Books.containsKey(itemID)) {
 				int quantity = Integer.parseInt(Books.get(itemID).split(",")[1]);
 				if (quantity > 0) {
-					logger.info("Books in Concordia Library before user request " + Books);
+					logger.info("Books in Concordia Library before user request " + Books + ".\n");
 					if (userID.contains("CON")) {
 						message = setUserDetails(userID, itemID, numberOfDays);
-						logger.info(userID + "User borrowed book details after borrowing Concordia library book "
-								+ userlist.get(userID));
+						logger.info(userID + " borrowed book details after borrowing " + itemID + ":"
+								+ userlist.get(userID) + ".\n");
 					}
 					if (message.contains("Successfully")) {
 						quantity--;
 						Books.put(itemID, Books.get(itemID).split(",")[0] + "," + quantity);
+						if (waitlistBook.containsKey(itemID)) {
+							waitUserList = waitlistBook.get(itemID);
+							if (waitUserList.containsKey(userID)) {
+								waitUserList.remove(userID);
+								waitlistBook.put(itemID, waitUserList);
+							}
+							if (waitUserList.isEmpty()) {
+								waitlistBook.remove(itemID);
+							}
+						}
+
+						logger.info("Request completed successfully.\n");
 					}
 
-					logger.info("Books in Concordia Library after user request" + Books);
+					logger.info("Books in Concordia Library after user request " + Books + ".\n");
 				} else {
-					message = "Unavailable :  Book requested is currently not available";
+					temp = userlist.get(userID);
+					if (waitlistBook.containsKey(itemID)) {
+						userInfo = waitlistBook.get(itemID);
+					}
+
+					if (temp != null && temp.containsKey(itemID)) {
+						logger.info("Request failed: Item requested is already available in user's burrowed list.\n");
+						message = "Item already available in user's burrowed list.Can't Borrow Same Item Again.";
+					}
+
+					else if (!userInfo.isEmpty() && userInfo.containsKey(userID)) {
+						message = "User " + userID + " already present in " + itemID + " waitlist.";
+						logger.info("Request failed: " + message);
+					} else {
+						message = "Unavailable : Book requested is currently not available";
+					}
 				}
+
 			} else {
 				message = "InvalidBook: Book ID is Invalid. PLease Provide a Valid Item Id ";
+				logger.info("Request failed : Book ID Provded is invalid");
 			}
 			break;
 
 		case "MON":
 			if (isUserAllowedInterLibraryBorrow(lib, userID)) {
-				logger.info("User is allowed to borrow requested book");
-				logger.info("***********************************************");
+				logger.info("User is allowed to borrow requested book.\n");
+				logger.info("***********************************************\n");
+				logger.info(userID + "User borrowed book details before borrowing " + itemID + ": "
+						+ userlist.get(userID) + ".\n");
+				sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays + "," + message;
+				sendMessage(2222);
+				message = dataReceived;
+				logger.info(message + ".\n");
 				if (message.contains("Successfully")) {
-					sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays + "," + message;
+					message = setUserDetails(userID, itemID, numberOfDays);
+					logger.info(userID + "User borrowed book details after borrowing " + itemID + ": "
+							+ userlist.get(userID) + ".\n");
+				}
+
+			} else {
+				logger.info("Request failed: User is not allowed to borrow requested book. Already Borrowed one book.");
+				if (Thread.currentThread().getStackTrace()[3].getMethodName().equalsIgnoreCase("returnItem") || Thread.currentThread().getStackTrace()[3].getMethodName().equalsIgnoreCase("addItem")) {
+					sendRequestMessage = "CheckWaitlist" + "," + userID + "," + itemID;
 					sendMessage(2222);
 					message = dataReceived;
-					logger.info(message);
-					if (message.contains("Successfully")) {
-						message = setUserDetails(userID, itemID, numberOfDays);
-						logger.info(userID + "User borrowed book details after borrowing Montreal library book "
-								+ userlist.get(userID));
+					if (message.contains("removed")) {
+						message = "User removed from waitlist";
+						logger.info(
+								"Request failed: User was not allowed to borrow requested book and is removed from waitlist\n");
 					}
-
+				} else {
+					message = userID + " has already borrowed one Montreal Library book. Maximum borrow limit is one.";
 				}
-			} else {
-				message = "User has already borrowed one Montreal Library book";
 			}
 			break;
+
 		case "MCG":
 			if (isUserAllowedInterLibraryBorrow(lib, userID)) {
-				logger.info("User is allowed to borrow requested book");
-				logger.info("***********************************************");
-
+				logger.info("User is allowed to borrow requested book\n");
+				logger.info("***********************************************\n");
+				logger.info(userID + "User borrowed book details before borrowing " + itemID + ": "
+						+ userlist.get(userID) + ".\n");
+				sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays + "," + message;
+				sendMessage(3333);
+				message = dataReceived;
+				logger.info(message);
 				if (message.contains("Successfully")) {
-					sendRequestMessage = "BORROW" + "," + userID + "," + itemID + "," + numberOfDays + "," + message;
+					message = setUserDetails(userID, itemID, numberOfDays);
+					logger.info(userID + "User borrowed book details after borrowing " + itemID + ": "
+							+ userlist.get(userID) + ".\n");
+				}
+
+			} else {
+				logger.info("Request failed: User is not allowed to borrow requested book. Already Borrowed one book.");
+				if (Thread.currentThread().getStackTrace()[3].getMethodName().equalsIgnoreCase("returnItem") || Thread.currentThread().getStackTrace()[3].getMethodName().equalsIgnoreCase("addItem")) {
+					sendRequestMessage = "CheckWaitlist" + "," + userID + "," + itemID;
 					sendMessage(3333);
 					message = dataReceived;
-					if (message.contains("Successfully")) {
-						message = setUserDetails(userID, itemID, numberOfDays);
-						logger.info(userID + "User borrowed book details after borrowing MCGILL library book "
-								+ userlist.get(userID));
+					if (message.contains("removed")) {
+						logger.info(
+								"Request failed: User was not allowed to borrow requested book and is removed from waitlist\n");
 					}
-
+				} else {
+					message = userID + " has already borrowed one McGill Library book. Maximum borrow limit is one.";
 				}
-			} else {
-				message = "User has already borrowed one MCGIll Library book";
 			}
 			break;
 		}
 
 		return message;
+
 	}
 
-	public static String addUserToWaitlist(String userID, String itemID, int numberOfdays) {
-		HashMap<String, Integer> userInfo;
+	public static String addUserToWaitlist(String userID, String itemID, int numberOfDays) {
+
 		String library = itemID.substring(0, 3).toUpperCase();
+		LinkedHashMap<String, Integer> waitUList = new LinkedHashMap<String, Integer>();
 		switch (library) {
 		case "CON":
+			logger.info("*****Adding User to WaitList*******\n");
+			logger.info("Wait list of Concordia Book before user request: \n");
+			waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
 			if (waitlistBook.containsKey(itemID)) {
-				userInfo = waitlistBook.get(itemID);
-				if (userInfo.containsKey(userID)) {
-					message = "User " + userID + " already in waitlist of book with item ID " + itemID;
-					logger.info(message);
-				} else {
-					waitUserList.put(userID, numberOfdays);
-					waitlistBook.put(itemID, waitUserList);
-					message = "Added user " + userID + " to " + itemID + " waitlist Successfully !!";
-					logger.info("Wait list of Concordia Book List : ");
-					waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
-				}
+				logger.info("Adding " + userID + " to waitlist of itemID" + itemID);
+				waitUList = waitlistBook.get(itemID);
+				waitUList.put(userID, numberOfDays);
+				waitlistBook.put(itemID, waitUList);
+			} else {
+				logger.info("Adding " + userID + " to waitlist of itemID" + itemID);
+				waitUList.put(userID, numberOfDays);
+				waitlistBook.put(itemID, waitUList);
 			}
+
+			message = userID + " added to " + itemID + " waitlist Successfully !!";
+			logger.info("Request completed successfully.\n");
+			logger.info(message);
+			logger.info("Wait list of Concordia Book  After user request:\n");
+			waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
 			break;
 
 		case "MON":
-			sendRequestMessage = "WAIT" + "," + userID + "," + itemID + "," + numberOfdays;
+			sendRequestMessage = "WAIT" + "," + userID + "," + itemID + "," + numberOfDays;
 			sendMessage(2222);
 			message = dataReceived;
-			logger.info(message);
 			break;
 
 		case "MCG":
-			sendRequestMessage = "WAIT" + "," + userID + "," + itemID + "," + numberOfdays;
+			sendRequestMessage = "WAIT" + "," + userID + "," + itemID + "," + numberOfDays;
 			sendMessage(3333);
 			message = dataReceived;
-			logger.info(message);
 			break;
 		}
 		return message;
@@ -437,68 +457,71 @@ public class Concordia {
 		switch (lib) {
 		case "CON":
 			if (Books.containsKey(itemID)) {
-				logger.info("Returning Book at Concordia Library\n");
+				logger.info("*****Returning Book at Concordia Library*******\n");
 				int quantity = Integer.parseInt(Books.get(itemID).split(",")[1]);
-				logger.info("Books in Concordia Library before user request " + Books);
+				logger.info("Books in Concordia Library before user request:\n" + Books + "\n");
 				if (userID.contains("CON")) {
+
 					message = updateUserBookDetails(userID, itemID);
+					logger.info(userID + " borrowed book details after returning " + itemID + ":\n"
+							+ userlist.get(userID) + ".\n");
 				}
 				if (message.contains("Successfully")) {
 					quantity++;
 					Books.put(itemID, Books.get(itemID).split(",")[0] + "," + quantity);
+					logger.info("Request completed successfully.\n");
+					logger.info(itemID + " returned successfully.\n");
 					if (waitlistBook.containsKey(itemID)) {
-						logger.info(" Fetching available users from returned book (" + itemID + ") waitlist");
-						logger.info(" Wait List of Books in Concordia Library After user request " + waitlistBook);
+						logger.info(" Checking for any available users from \"" + itemID + "\" waitlist");
+						logger.info(" Wait List of \"" + itemID + "\" after user request:\n" + waitlistBook.get(itemID)
+								+ "\n");
 						HashMap<String, Integer> ulist = (HashMap<String, Integer>) waitlistBook.get(itemID);
+						String userList = new String();
 						if (!ulist.isEmpty()) {
+							Iterator<Entry<String, Integer>> iterator = ulist.entrySet().iterator();
+							while (iterator.hasNext()) {
+								Entry<String, Integer> thisEntry = iterator.next();
+								userList = userList.concat(thisEntry.getKey() + "-" + thisEntry.getValue() + ",");
 
-							String uID = ulist.keySet().toArray()[0].toString();
-							int numberOfDays = ulist.get(uID);
-							ulist.remove(uID);
-							waitlistBook.put(itemID, ulist);
-							logger.info(" User removed from the waitlist\n ");
-							logger.info(" Wait List of Books in Concordia Library After user request " + waitlistBook);
-							message = "Borrow," + uID + "," + numberOfDays;
+							}
+							message = "Borrow" + userList;
 						}
 					}
-
 				}
-
-				logger.info(" Concordia User borrow list" + userlist);
-				logger.info(" Books in Concordia Library after user request" + Books);
+				logger.info("Books in Concordia Library after user request :\n" + Books + "\n");
 
 			} else {
-				message = "InvalidBook";
+				message = "InvalidBook : Book Id is Invalid.";
+				logger.info("Request failed.Invalid Book Id provided\n");
 			}
 			break;
 
 		case "MON":
-
-			logger.info("***********************************************");
+			logger.info("***********************************************\n");
+			logger.info(
+					userID + " borrowed book details before returning " + itemID + ":\n" + userlist.get(userID) + "\n");
 			message = updateUserBookDetails(userID, itemID);
 			if (message.contains("Successfully")) {
 				sendRequestMessage = "RETURN" + "," + userID + "," + itemID + "," + message;
 				sendMessage(2222);
 				message = dataReceived;
-				if (dataReceived.equalsIgnoreCase("pass")) {
-					message = dataReceived;
-					logger.info(userlist + " after returning Montreal library book");
-				}
 			}
+			logger.info(
+					userID + " borrowed book details after returning " + itemID + ":\n" + userlist.get(userID) + "\n");
 			break;
 
 		case "MCG":
-			logger.info("***********************************************");
+			logger.info("***********************************************\n");
+			logger.info(
+					userID + " borrowed book details before returning " + itemID + ":\n" + userlist.get(userID) + "\n");
 			message = updateUserBookDetails(userID, itemID);
 			if (message.contains("Successfully")) {
 				sendRequestMessage = "RETURN" + "," + userID + "," + itemID + "," + message;
 				sendMessage(3333);
 				message = dataReceived;
-				if (dataReceived.equalsIgnoreCase("pass")) {
-					message = dataReceived;
-					logger.info(userlist + " after returning MCGILL library book");
-				}
 			}
+			logger.info(
+					userID + " borrowed book details after returning " + itemID + ":\n" + userlist.get(userID) + "\n");
 			break;
 		}
 		return message;
@@ -506,16 +529,17 @@ public class Concordia {
 
 	public static String findItem(String UserId, String itemName) {
 		String display = "";
-		display = fetchonItemName(Concordia.Books, itemName);
-		logger.info("***********************************************");
+		display = fetchonItemName(Books, itemName);
+		logger.info("***********************************************\n");
 		sendRequestMessage = "FIND" + "," + itemName;
 		sendMessage(2222);
 		display = display.concat(dataReceived);
-		logger.info("***********************************************");
+		logger.info("***********************************************\n");
 		sendRequestMessage = "FIND" + "," + itemName;
 		sendMessage(3333);
 		display = display.concat(dataReceived);
 
+		logger.info("Request completed successfully\n");
 		return display;
 
 	}
@@ -530,7 +554,7 @@ public class Concordia {
 				result = result.concat(key + "-" + value + "'");
 			}
 		}
-		logger.info(itemName + " details available in Concordia Library:" + result);
+		logger.info(itemName + " details available in Concordia Library:\n" + result);
 
 		return result;
 	}
@@ -551,35 +575,39 @@ public class Concordia {
 					conBooks.put(itemID, keyValue);
 					operation = "Book's quantity decreased by " + quantity
 							+ " Successfully  from the avaialable list! ";
-					logger.info("After removal" + Books.toString());
+					logger.info("After removal:\n" + Books.toString() + "\n");
+					logger.info("Request completed successfully");
 				} else if (quantity == -1) {
 					Books.remove(itemID);
-					removeItemFromuserlist(itemID);
-					logger.info("***********************************************");
+					removeItemFromUserlist(itemID);
+					logger.info("***********************************************\n");
 					sendRequestMessage = "REMOVE" + "," + itemID;
 					sendMessage(2222);
-					logger.info("***********************************************");
+					logger.info("***********************************************\n");
 					sendRequestMessage = "REMOVE" + "," + itemID;
 					sendMessage(3333);
 
-					operation = "Book removed Successfully and Borrowed List of available User's if aplicable!";
+					operation = "Book removed Successfully and Borrowed List of User's.";
 				}
 
 			}
 
 			else if (oldquantity < quantity) {
-				operation = "Invalid Quantity , Please enter a valid Quantity to be deleted";
-				logger.info("Invalid Quantity , Please enter a valid Quantity to be deleted ");
+				operation = "Invalid Quantity , Quantity provided is more than available quantity";
+				logger.info("Request Failed :  Quantity provided is more than available quantity ");
 			}
 		} else {
 			operation = "Invalid Book : Book is not available in Library";
+			logger.info("Request Failed :  Book Id provided is not available in Library ");
 		}
 		return operation;
 	}
 
-	private static void removeItemFromuserlist(String itemId) {
-		logger.info("Before Removal of Item Id from library, Concordia userList:" + userlist.toString());
-		logger.info("Before Removal of Item Id from library, Concordia waitList:" + waitlistBook.toString());
+	private static void removeItemFromUserlist(String itemId) {
+		logger.info("Before Removal of " + itemId + " from library, Concordia user's Borrow List:\n"
+				+ userlist.toString() + "\n");
+		logger.info("Before Removal of " + itemId + " from library, Concordia waitList:\n" + waitlistBook.toString()
+				+ "\n");
 		Iterator<Entry<String, HashMap<String, Integer>>> coIterator = userlist.entrySet().iterator();
 		while (coIterator.hasNext()) {
 			Entry<String, HashMap<String, Integer>> pair = coIterator.next();
@@ -593,8 +621,29 @@ public class Concordia {
 
 			}
 		}
-		logger.info("After Removal of Item Id from library, Concordia userList:" + userlist.toString());
-		logger.info("After Removal of Item Id from library, Concordia waitList:" + waitlistBook.toString());
+		logger.info("Before Removal of " + itemId + " from library, Concordia user's Borrow List:\n"
+				+ userlist.toString() + "\n");
+		logger.info("Before Removal of " + itemId + " from library, Concordia waitList:\n" + waitlistBook.toString()
+				+ "\n");
+	}
+
+	private static String checkAndRemoveWaitList(String userID, String itemID) {
+		message = "";
+		if (waitlistBook.containsKey(itemID)) {
+			waitUserList = waitlistBook.get(itemID);
+			if (waitUserList.containsKey(userID)) {
+				waitUserList.remove(userID);
+				waitlistBook.put(itemID, waitUserList);
+				message = "User removed from waitlist";
+				logger.info(userID + " removed from waitlist of " + itemID + ".\n");
+			}
+			if (waitUserList.isEmpty()) {
+				waitlistBook.remove(itemID);
+			}
+
+		}
+
+		return message;
 	}
 
 }

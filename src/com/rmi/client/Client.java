@@ -44,32 +44,7 @@ public class Client {
 		serverRef = (ActionService) Naming.lookup(registryURL);
 	}
 
-//	Function to check whether the entered manager Id is authorized
-//	@return boolean value of isValidManagerFlag
-//	@params String array of manager and manager id entered
-
-	private static boolean isValidManager(String[] managerIDs, String managerID) {
-		int c = 0;
-		for (String id : managerIDs) {
-			c = id.equalsIgnoreCase(managerID) ? c = c + 1 : c;
-		}
-		isValidManagerFlag = (c == 1) ? true : false;
-		return isValidManagerFlag;
-	}
-
-//	Function to check whether the entered user Id is authorised
-//	@return boolean value of isValidUserFlag
-//	@params String array of user and user id entered
-
-//	private static boolean isValidUser(String[] userIDs, String userID) {
-//		int c = 0;
-//		for (String id : userIDs) {
-//			c = id.equalsIgnoreCase(userID) ? c = c + 1 : c;
-//		}
-//		isValidUserFlag = (c == 1) ? true : false;
-//		return isValidUserFlag;
-//	}
-
+	
 	private static boolean isOperatorIdCorrect(String operatorID) {
 		isIDCorrect = false;
 
@@ -127,9 +102,8 @@ public class Client {
 	}
 
 	private static void loggingOperator(String operator, String operatorID) throws SecurityException, IOException {
-		fileHandler = new FileHandler(
-				"/Users/SGarg/Shresthi/Winter 2019/DS-COMP 6231/assignment/DLMS_DS2019/DistributedLibraryManagementSystem/Logs/Client/"
-						+ operator + "/" + operatorID + ".log");
+		fileHandler = new FileHandler("C:\\Users\\mchaturv\\git\\DLMS_RMI_v2\\DLMS_RMI\\Logs\\Client\\" + operator
+				+ "\\" + operatorID + ".log");
 
 		formatterTxt = new SimpleFormatter();
 		fileHandler.setFormatter(formatterTxt);
@@ -168,17 +142,24 @@ public class Client {
 						System.out.println("\nSorry! The entered book name cannot be blank \n");
 						break;
 					}
+					if (itemName.trim().isEmpty()) {
+						System.out.println("Book Name only contains whitespace (ie. spaces, tabs or line breaks)\n");
+						break;
+					}
+
 					System.out.print("\nEnter the quantity of book(s) to be added : ");
 
 					try {
 						quantity = Integer.parseInt(reader.readLine());
 					} catch (NumberFormatException ex) {
-						System.out.println("Quantity cannot be empty.");
+						System.out.println("Quantity should be a valid Digit.\n");
 						break;
 					}
 					if (quantity > 0) {
-						System.out.println("\nAdding book with book id " + itemId + " and book name " + itemName
-								+ " and quantity " + quantity);
+						/*
+						 * System.out.println("\nAdding book with book id " + itemId + " and book name "
+						 * + itemName + " and quantity " + quantity);
+						 */
 						logger.info("***** Manager with manager ID " + managerID
 								+ "initiated an add book request for book id \n" + itemId + " book name " + itemName
 								+ " quantity " + quantity + " in " + serverName + " library");
@@ -189,7 +170,7 @@ public class Client {
 						loop = false;
 					} else {
 						logger.log(Level.SEVERE, "\nInvalid quantity entered. Entered book's quantity is " + quantity);
-						System.out.println("\nPlease enter a valid quantity. It cannot be less than or equal to zero.");
+						System.out.println("\nPlease enter a valid quantity. It cannot be less than or equal to zero.\n");
 						break;
 					}
 				}
@@ -209,7 +190,7 @@ public class Client {
 					isItemIdCorrect = isItemIdCorrect(serverName, itemId);
 					if (!isItemIdCorrect) {
 						System.out.println(
-								"The given book id has an invalid format. Please try again with a valid book id.");
+								"The given book id has an invalid format. Please try again with a valid book id.\n");
 						logger.log(Level.SEVERE, "\nInvalid Item Id, Enterred Item id : " + itemId);
 						break;
 					}
@@ -221,7 +202,7 @@ public class Client {
 					try {
 						choice = Integer.parseInt(reader.readLine());
 					} catch (NumberFormatException ex) {
-						System.out.println("Choice cannot be empty.");
+						System.out.println("Enter a valid choice.");
 						break;
 					}
 					if (choice == 1) {
@@ -237,40 +218,31 @@ public class Client {
 					} else if (choice == 2) {
 						loop = true;
 						while (loop) {
-							System.out.print("\nEnter the quantity by which the book's quantity be reduced :");
+							System.out.print("\nEnter the quantity by which the book's quantity needs to be reduced [Enter -1 to remove the book itself]:");
 							try {
 								quantity = Integer.parseInt(reader.readLine());
 							} catch (NumberFormatException ex) {
-								System.out.println("\nQuantity cannot be empty.");
+								System.out.println("\nQuantity should be a valid Digit.\n");
 								break;
 							}
-							if (quantity > 0) {
+							if (quantity > 0 || quantity == -1) {
 								logger.info("***** Manager with manager ID " + managerID
 										+ "initiated an reduce quantity of book request for book id " + itemId
 										+ " with quantity " + quantity + " in " + serverName + " library");
 								logger.info("***** Entering removeItem operation to remove the entire book ****");
 								output = serverRef.removeItem(operatorID, itemId, quantity);
 								logger.info("Response received from server : " + output);
-								if (!output.contains("INVALID")) {
-									System.out.println("\n" + output);
+								if (!output.contains("Invalid")) {
+									System.out.println("\n" + output+"\n");
+									logger.log(Level.SEVERE,output);
 									loop = false;
 									correctchoice = false;
-								} else if (output.equals("Invalid Quantity")) {
-									logger.log(Level.SEVERE, "(The quantity of books available for the book id" + itemId
-											+ " is lesser than the quantity provided) \nInvalid quantity, Entered quantity : "
-											+ quantity);
-									System.out.println("\nThe entered quantity is invalid."
-											+ "(The quantity of books available for the book id" + itemId
-											+ " is lesser than the quantity provided)");
-								} else if (output.equals("Invalid Book")) {
-									logger.log(Level.SEVERE, "Invalid book id, Entered book id : " + itemId);
-									System.out.println(
-											"\nThe entered book id has an invalid format. Please try again with a valid book id.");
-									loop = false;
-									correctchoice = false;
-								}
+								} else  {
+									logger.log(Level.SEVERE, output+"\n");
+									System.out.println(output);
+								} 
 
-							} else {
+							} else if(quantity<-1|| quantity==0){
 								logger.log(Level.SEVERE, "Invalid quantity, Entered quantity : " + quantity);
 								System.err.println(
 										"\nPlease enter a valid quantity. It can not be less than or equals to zero \n");
@@ -289,7 +261,7 @@ public class Client {
 				logger.info("***** Entering listItemAvailability operation to list all the books in library ****");
 				bookList = serverRef.listItemAvailability(operatorID);
 				logger.info("Response received from server : " + bookList);
-				System.out.println("\nBooks Available in Library are : ");
+				System.out.println("\nBooks Available in Library are : \n");
 				bookList.forEach(
 						(k, v) -> System.out.println(("\n* " + k + " " + v.split(",")[0] + " " + v.split(",")[1])));
 
@@ -297,7 +269,7 @@ public class Client {
 
 			default:
 				logger.log(Level.SEVERE, "\nInvalid choice entered by user");
-				System.err.println("\nPlease enter a valid choice.");
+				System.err.println("\nPlease enter a valid choice.\n");
 
 			}
 
@@ -342,7 +314,7 @@ public class Client {
 					try {
 						numberOfDays = Integer.parseInt(reader.readLine());
 					} catch (NumberFormatException ex) {
-						System.out.println("\nQuantity cannot be empty.");
+						System.out.println("\nQuantity should be a valid Digit.\n");
 						break;
 					}
 					if (numberOfDays > 0) {
@@ -443,10 +415,7 @@ public class Client {
 	}
 
 	public static void main(String[] args) throws Exception {
-		String[] managerIDs = { "CONM1122", "CONM2233", "CONM3344", "CONM4455", "MONMS1122", "MONM2233", "MONM3344",
-				"MONM4455", "MCGM1122", "MCGM2233", "MCGM3344", "MCGM4455" };
-		String[] userIDs = { "CONU1122", "CONU2233", "CONU3344", "CONU4455", "MONUS1122", "MONU2233", "MONU3344",
-				"MONU4455", "MCGU1122", "MCGU2233", "MCGU3344", "MCGU4455" };
+
 		boolean stopRunning = false;
 
 		try {
@@ -470,30 +439,28 @@ public class Client {
 					operatorRole = operatorID.charAt(3);
 					serverName = operatorID.substring(0, 3);
 					getregistryURI(serverName);
-					try {
-						switch (operatorRole) {
-						case 'M':
-							if (!isValidManager(managerIDs, operatorID)) {
-								System.out.println(
-										"\nSorry! You are not an authorized Manager to avail library service.");
-							} else {
+					if (!serverRef.validateUser(operatorID)) {
+						System.out.println("User ID does not exist in System\n");
+					} else {
+						try {
+							switch (operatorRole) {
+							case 'M':
+
 								loggingOperator("Manager", operatorID);
 								managerOperation(operatorID);
+
+								break;
+
+							case 'U':
+
+								loggingOperator("User", operatorID);
+								userOperation(operatorID);
+
+								break;
 							}
-
-							break;
-
-						case 'U':
-//							if (!isValidUser(userIDs, operatorID)) {
-//								System.out.println("\nSorry! You are not an authorized User to avail library service.");
-//							} else {
-							loggingOperator("User", operatorID);
-							userOperation(operatorID);
-//							}
-							break;
+						} catch (NumberFormatException e) {
+							e.printStackTrace();
 						}
-					} catch (NumberFormatException e) {
-						e.printStackTrace();
 					}
 				}
 			}

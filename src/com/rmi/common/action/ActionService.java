@@ -22,8 +22,6 @@ public interface ActionService extends Remote {
 	// Lists Item of the Library
 	public HashMap<String, String> listItemAvailability(String managerID) throws RemoteException;
 
-	// User
-
 	// Borrows an Item to the User
 	public String borrowItem(String userID, String itemID, int numberOfDays) throws RemoteException;
 
@@ -35,5 +33,7 @@ public interface ActionService extends Remote {
 
 	// Returns Item to the Library
 	public String returnItem(String userID, String itemID) throws RemoteException;
+	
+	public boolean validateUser(String userID) throws RemoteException;;
 
 }

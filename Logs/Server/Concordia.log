@@ -1,30 +1,60 @@
-Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia startConcordiaServer
+Feb 15, 2019 9:02:56 PM com.rmi.libraries.Concordia startConcordiaServer
 INFO: Concordia registry created.
-Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia startConcordiaServer
+Feb 15, 2019 9:02:56 PM com.rmi.libraries.Concordia startConcordiaServer
 INFO: Concordia Server bound in registry
-Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia startConcordiaServer
+Feb 15, 2019 9:02:56 PM com.rmi.libraries.Concordia startConcordiaServer
 INFO: ** Setting Library Details **
-Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia setLibraryDetails
+Feb 15, 2019 9:02:56 PM com.rmi.libraries.Concordia setLibraryDetails
 INFO:  ** Books registered while initialization
 
-Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia lambda$1
-INFO: **  CON7878 Complier Design 4
+Feb 15, 2019 9:02:56 PM com.rmi.libraries.Concordia lambda$1
+INFO: **  CON1111 Compiler Design 4
 
-Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia lambda$1
-INFO: **  CON2565 Discrete Mathmatical Structure 0
+Feb 15, 2019 9:02:56 PM com.rmi.libraries.Concordia lambda$1
+INFO: **  CON2222 Discrete Mathmatical Structure 0
 
-Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia setLibraryDetails
+Feb 15, 2019 9:02:56 PM com.rmi.libraries.Concordia lambda$1
+INFO: **  CON3333 Graph Theory 2
+
+Feb 15, 2019 9:02:56 PM com.rmi.libraries.Concordia lambda$1
+INFO: **  CON4444 Data Structure 8
+
+Feb 15, 2019 9:02:56 PM com.rmi.libraries.Concordia setLibraryDetails
 INFO:  ** User registered while initialization
 
-Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia lambda$2
-INFO: **  CONU4774 {}
+Feb 15, 2019 9:02:56 PM com.rmi.libraries.Concordia lambda$2
+INFO: **  CONU1122 {CON1111=12, CON2222=23, MCG2222=18, MON2222=18}
 
-Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia lambda$2
-INFO: **  CONU1234 {CON7878=12, CON2565=23, MCG4592=18}
+Feb 15, 2019 9:02:56 PM com.rmi.libraries.Concordia lambda$2
+INFO: **  CONU2233 {}
 
-Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia setLibraryDetails
+Feb 15, 2019 9:02:56 PM com.rmi.libraries.Concordia lambda$2
+INFO: **  CONU3344 {}
+
+Feb 15, 2019 9:02:56 PM com.rmi.libraries.Concordia setLibraryDetails
 INFO:  ** Books WaitList registered while initialization
 
-Feb 10, 2019 1:41:18 AM com.rmi.libraries.Concordia lambda$3
-INFO: **  CON2565 {MONU7474=17}
+Feb 15, 2019 9:02:56 PM com.rmi.libraries.Concordia lambda$3
+INFO: **  CON2222 {MONU1122=17, CONU2233=19}
 
+Feb 15, 2019 9:03:24 PM com.rmi.common.action.ActionServiceImpl borrowItem
+INFO: 
+*****Entering Concordia Server*****
+Feb 15, 2019 9:03:24 PM com.rmi.common.action.ActionServiceImpl borrowItem
+INFO: Request Type: Borrow an item , Request params: userID CONU2233, itemID MON2222, numberOfDays 12
+Feb 15, 2019 9:03:24 PM com.rmi.libraries.Concordia isUserAllowedInterLibraryBorrow
+INFO: Checking User Info for accessibilty for requested book
+
+Feb 15, 2019 9:03:24 PM com.rmi.libraries.Concordia borrowBookToUser
+INFO: User is allowed to borrow requested book.
+
+Feb 15, 2019 9:03:24 PM com.rmi.libraries.Concordia borrowBookToUser
+INFO: ***********************************************
+
+Feb 15, 2019 9:03:24 PM com.rmi.libraries.Concordia borrowBookToUser
+INFO: CONU2233User borrowed book details before borrowing MON2222: {}.
+
+Feb 15, 2019 9:03:24 PM com.rmi.libraries.Concordia sendMessage
+INFO: Request message sent from the Concordia to server with port number 2222 is: BORROW,CONU2233,MON2222,12,Successfully
+Feb 15, 2019 9:03:24 PM com.rmi.libraries.Concordia sendMessage
+INFO: Reply received from the server with port number 2222 to Concordia server is: Unavailable : Book requested is currently not available
