@@ -30,6 +30,7 @@ public class ActionServiceImpl extends UnicastRemoteObject implements ActionServ
 	public String addItem(String managerID, String itemID, String itemName, int quantity) throws RemoteException {
 		itemID = itemID.toUpperCase();
 		String operation = "";
+		
 		switch (managerID.substring(0, 3)) {
 		case "CON":
 			Concordia.logger.info("\n*****Entering Concordia Server*****\n");

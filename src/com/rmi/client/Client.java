@@ -102,8 +102,8 @@ public class Client {
 	}
 
 	private static void loggingOperator(String operator, String operatorID) throws SecurityException, IOException {
-		fileHandler = new FileHandler("C:\\Users\\mchaturv\\git\\DLMS_RMI_v2\\DLMS_RMI\\Logs\\Client\\" + operator
-				+ "\\" + operatorID + ".log");
+		fileHandler = new FileHandler("Logs/Client/" + operator
+				+ "/" + operatorID + ".log");
 
 		formatterTxt = new SimpleFormatter();
 		fileHandler.setFormatter(formatterTxt);
@@ -118,7 +118,7 @@ public class Client {
 			System.out.println("\nEnter your choice : " + "\n1. Type 1 to add a book to the library."
 					+ "\n2. Type 2 to remove a book from the library."
 					+ "\n3. Type 3 to list all the available books in the library.");
-			System.out.print("\nEnter your choice : ");
+			System.out.println("\nEnter your choice : ");
 			String managerCommand = (reader.readLine());
 			switch (managerCommand) {
 
@@ -128,26 +128,27 @@ public class Client {
 				isItemIdCorrect = false;
 				Boolean loop = true;
 				while (loop) {
-					System.out.print("\nEnter the book id : ");
+					System.out.println("\nEnter the book id : ");
 					itemId = reader.readLine();
 					isItemIdCorrect = isItemIdCorrect(serverName, itemId);
 					if (!isItemIdCorrect) {
 						logger.log(Level.SEVERE, "\nThe entered book id has an invalid format\n");
-						System.out.println("\nSorry! The entered book id has an invalid format \n");
+						System.out.println(
+								"The given book id has an invalid format. Please try again with a valid book id.\n");
 						break;
 					}
-					System.out.print("\nEnter the associated book name : ");
+					System.out.println("Enter the associated book name : ");
 					String itemName = (reader.readLine());
 					if (itemName.isEmpty()) {
-						System.out.println("\nSorry! The entered book name cannot be blank \n");
+						System.out.println("Sorry! The entered book name cannot be blank \n");
 						break;
 					}
 					if (itemName.trim().isEmpty()) {
-						System.out.println("Book Name only contains whitespace (ie. spaces, tabs or line breaks)\n");
+						System.out.println("Invalid Book Name provided. Contains only contains whitespace (ie. spaces, tabs or line breaks)\n");
 						break;
 					}
 
-					System.out.print("\nEnter the quantity of book(s) to be added : ");
+					System.out.println("\nEnter the quantity of book(s) to be added : ");
 
 					try {
 						quantity = Integer.parseInt(reader.readLine());
@@ -185,7 +186,7 @@ public class Client {
 				int choice;
 				Boolean correctchoice = true;
 				while (correctchoice) {
-					System.out.print("\nEnter the book id : ");
+					System.out.println("\nEnter the book id : ");
 					itemId = (reader.readLine());
 					isItemIdCorrect = isItemIdCorrect(serverName, itemId);
 					if (!isItemIdCorrect) {
@@ -198,7 +199,7 @@ public class Client {
 					System.out.println("\nPlease chose the following operation for removal : "
 							+ "\nType 1 to Remove the entire item from library."
 							+ "\nType 2 to Decrease the quantity of the book.");
-					System.out.print("\nEnter your choice : ");
+					System.out.println("\nEnter your choice : ");
 					try {
 						choice = Integer.parseInt(reader.readLine());
 					} catch (NumberFormatException ex) {
@@ -216,9 +217,8 @@ public class Client {
 						System.out.println(output);
 						correctchoice = false;
 					} else if (choice == 2) {
-						loop = true;
-						while (loop) {
-							System.out.print("\nEnter the quantity by which the book's quantity needs to be reduced [Enter -1 to remove the book itself]:");
+						
+							System.out.println("\nEnter the quantity by which the book's quantity needs to be reduced [Enter -1 to remove the book itself]:");
 							try {
 								quantity = Integer.parseInt(reader.readLine());
 							} catch (NumberFormatException ex) {
@@ -235,22 +235,26 @@ public class Client {
 								if (!output.contains("Invalid")) {
 									System.out.println("\n" + output+"\n");
 									logger.log(Level.SEVERE,output);
-									loop = false;
+									
 									correctchoice = false;
 								} else  {
 									logger.log(Level.SEVERE, output+"\n");
 									System.out.println(output);
+									
+									correctchoice = false;
 								} 
 
 							} else if(quantity<-1|| quantity==0){
 								logger.log(Level.SEVERE, "Invalid quantity, Entered quantity : " + quantity);
-								System.err.println(
+								System.out.println(
 										"\nPlease enter a valid quantity. It can not be less than or equals to zero \n");
+								
+								correctchoice = false;
 
 							}
-						}
+						
 					} else
-						System.err.println("\nSorry, it was an incorrect choice. Please enter a correct choice.");
+						System.out.println("\nSorry, it was an incorrect choice. Please enter a correct choice.");
 				}
 
 				break;
@@ -269,7 +273,7 @@ public class Client {
 
 			default:
 				logger.log(Level.SEVERE, "\nInvalid choice entered by user");
-				System.err.println("\nPlease enter a valid choice.\n");
+				System.out.println("\nPlease enter a valid choice.\n");
 
 			}
 
@@ -293,7 +297,7 @@ public class Client {
 			System.out.println("\nEnter your choice : \n" + "\n1. Type 1 to borrow a book from the library."
 					+ "\n2. Type 2 to find a book in the library."
 					+ "\n3. Type 3 to return a book back to the library \n");
-			System.out.print("Enter your choice : ");
+			System.out.println("Enter your choice : ");
 			String managerCommand = (reader.readLine());
 			switch (managerCommand) {
 			case "1":
@@ -303,18 +307,19 @@ public class Client {
 				Boolean loop = true;
 				int numberOfDays = 0;
 				while (loop) {
-					System.out.print("\nEnter item id of the book : ");
+					System.out.println("\nEnter item id of the book : ");
 					itemId = (reader.readLine());
 					isItemIdCorrect = isItemIdCorrect(itemId);
 					if (!isItemIdCorrect) {
-						System.out.println("\nInvalid Item Id: Enter Valid Item id \n");
+						System.out.println(
+								"The given book id has an invalid format. Please try again with a valid book id.\n");
 						break;
 					}
-					System.out.print("\nEnter the number of days you wish to borrow the book : ");
+					System.out.println("\nEnter the number of days you wish to borrow the book : ");
 					try {
 						numberOfDays = Integer.parseInt(reader.readLine());
 					} catch (NumberFormatException ex) {
-						System.out.println("\nQuantity should be a valid Digit.\n");
+						System.out.println("\nQuantity should be a valid Digit.\n");System.err.flush();;
 						break;
 					}
 					if (numberOfDays > 0) {
@@ -325,7 +330,7 @@ public class Client {
 						if (operation.contains("Unavailable")) {
 							System.out.println("\nBook with item ID: " + itemId + " is unavailable!");
 							logger.info("Response received from server : " + operation);
-							System.out.print("\nDo you wish to enter into a waitlist?  Yes or No : ");
+							System.out.println("\nDo you wish to enter into a waitlist ?  Yes or No : ");
 							String choice = reader.readLine();
 							if (choice.equalsIgnoreCase("Yes")) {
 								logger.info("User opted to enter a waitlist");
@@ -340,30 +345,39 @@ public class Client {
 								System.out.println("\nAlright! We did not add you in wait list.\n");
 								logger.info("User did not opt to enter a waitlist");
 							}
-
-						} else {
+						} 
+						else
+						{
 							logger.info("Response received from server : " + operation);
-							System.out.println("\n" + operation);
+							System.out.println("\n" + operation);System.err.flush();
 						}
 						loop = false;
 					} else {
 						logger.log(Level.SEVERE, "Invalid number of days entered");
-						System.err.println(
-								"Please enter a valid number. You cannot borrow a book for less than or equals to Zero \n");
+						System.out.println(
+								"Please enter a valid number. You cannot borrow a book for less than or equals to Zero days\n");
+						break;
 					}
 				}
 				break;
 
 			case "2":
 				logger.info("User with user id " + userID + "opted to find a book");
-				System.out.print("\nEnter item name of the book : ");
+				System.out.println("\nEnter item name of the book : ");
 				String itemName = (reader.readLine());
+				if (itemName.isEmpty()) {
+					System.out.println("\nSorry! The entered book name cannot be blank \n");
+					break;
+				}
+				if (itemName.trim().isEmpty()) {
+					System.out.println("Invalid Book Name provided. Contains only contains whitespace (ie. spaces, tabs or line breaks)\n");
+					break;
+				}
 				String bookList = "";
 				logger.info("User with user id " + userID + "opted to find a book with name as " + itemName);
 				logger.info("***** Entering findItem operation ****");
 				bookList = serverRef.findItem(userID, itemName);
 				logger.info("Response received from server : " + bookList);
-				System.out.println(bookList);
 				if (!bookList.equals("")) {
 					System.out.println("\nBooks Available in Library with '" + itemName + "':\n");
 					String[] books = bookList.split("'");
@@ -374,6 +388,7 @@ public class Client {
 				} else {
 					logger.log(Level.SEVERE, "\nNo book available with the entered name");
 					System.out.println("\nNo book available with the entered name");
+					break;
 				}
 
 				break;
@@ -387,7 +402,8 @@ public class Client {
 					itemId = (reader.readLine());
 					isItemIdCorrect = isItemIdCorrect(itemId);
 					if (!isItemIdCorrect)
-						System.err.println("The entered book id has an invalid book format.\n");
+						System.out.println(
+								"The given book id has an invalid format. Please try again with a valid book id.\n");
 				}
 				logger.info("User with user id " + userID + "opted to return a book with item id " + itemId);
 				logger.info("***** Entering returnItem operation ****");
@@ -399,7 +415,7 @@ public class Client {
 
 			default:
 				logger.log(Level.SEVERE, "\nInvalid choice entered by user");
-				System.err.println("\nPlease make a valid choice.");
+				System.out.println("\nPlease make a valid choice.");
 
 			}
 
@@ -424,7 +440,7 @@ public class Client {
 			while (!stopRunning) {
 				System.out.println("\n** Welcome to Library **");
 				System.out.println("\n(At any point of time type 'Quit' to exit)");
-				System.out.print("\nPlease enter a valid User Id or Manager Id : ");
+				System.out.println("\nPlease enter a valid User Id or Manager Id : ");
 				operatorID = (reader.readLine()).toUpperCase();
 
 				if (operatorID.equalsIgnoreCase("quit")) {

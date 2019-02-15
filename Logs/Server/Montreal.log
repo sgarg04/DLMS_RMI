@@ -1,165 +1,38 @@
-Feb 15, 2019 9:02:56 PM com.rmi.libraries.Montreal startMontrealServer
+Feb 16, 2019 1:03:14 AM com.rmi.libraries.Montreal startMontrealServer
 INFO: Montreal registry created.
 
-Feb 15, 2019 9:02:56 PM com.rmi.libraries.Montreal startMontrealServer
+Feb 16, 2019 1:03:14 AM com.rmi.libraries.Montreal startMontrealServer
 INFO: Montreal Server bound in registry 
 
-Feb 15, 2019 9:02:56 PM com.rmi.libraries.Montreal startMontrealServer
+Feb 16, 2019 1:03:14 AM com.rmi.libraries.Montreal startMontrealServer
 INFO: Setting Library Details 
 
-Feb 15, 2019 9:02:56 PM com.rmi.libraries.Montreal setLibraryDetails
+Feb 16, 2019 1:03:14 AM com.rmi.libraries.Montreal setLibraryDetails
 INFO: Books registered while initialization
 
-Feb 15, 2019 9:02:56 PM com.rmi.libraries.Montreal lambda$1
+Feb 16, 2019 1:03:14 AM com.rmi.libraries.Montreal lambda$1
 INFO: **  MON1111 Computer Networks 9
 
-Feb 15, 2019 9:02:56 PM com.rmi.libraries.Montreal lambda$1
+Feb 16, 2019 1:03:14 AM com.rmi.libraries.Montreal lambda$1
 INFO: **  MON2222 Computer Organization 0
 
-Feb 15, 2019 9:02:56 PM com.rmi.libraries.Montreal lambda$1
+Feb 16, 2019 1:03:14 AM com.rmi.libraries.Montreal lambda$1
 INFO: **  MON3333 Discrete Mathmatical Structure 1
 
-Feb 15, 2019 9:02:56 PM com.rmi.libraries.Montreal lambda$1
+Feb 16, 2019 1:03:14 AM com.rmi.libraries.Montreal lambda$1
 INFO: **  MON4444 Data Structure 8
 
-Feb 15, 2019 9:02:56 PM com.rmi.libraries.Montreal setLibraryDetails
+Feb 16, 2019 1:03:14 AM com.rmi.libraries.Montreal setLibraryDetails
 INFO: User registered while initialization
 
-Feb 15, 2019 9:02:56 PM com.rmi.libraries.Montreal lambda$2
+Feb 16, 2019 1:03:14 AM com.rmi.libraries.Montreal lambda$2
 INFO: **  MONU1122 {MON1111=12, MON3333=23}
 
-Feb 15, 2019 9:02:56 PM com.rmi.libraries.Montreal lambda$2
+Feb 16, 2019 1:03:14 AM com.rmi.libraries.Montreal lambda$2
 INFO: **  MONU2233 {CON1111=18, MON3333=2}
 
-Feb 15, 2019 9:02:56 PM com.rmi.libraries.Montreal setLibraryDetails
+Feb 16, 2019 1:03:14 AM com.rmi.libraries.Montreal setLibraryDetails
 INFO: Books WaitList registered while initialization
 
-Feb 15, 2019 9:03:24 PM com.rmi.libraries.Montreal receive
-INFO: Request received at Montreal Server
-Feb 15, 2019 9:03:24 PM com.rmi.libraries.Montreal receive
-INFO: Request received is for BORROW
-Feb 15, 2019 9:03:24 PM com.rmi.libraries.Montreal borrowBookToUser
-INFO: CONU2233User borrowed book details before borrowing MOntreal library book null
-Feb 15, 2019 9:03:26 PM com.rmi.libraries.Montreal receive
-INFO: Request received at Montreal Server
-Feb 15, 2019 9:03:26 PM com.rmi.libraries.Montreal receive
-INFO: Request received is for WAIT
-Feb 15, 2019 9:03:26 PM com.rmi.libraries.Montreal addUserToWaitlist
-INFO: *****Adding User to WaitList*******
-
-Feb 15, 2019 9:03:26 PM com.rmi.libraries.Montreal addUserToWaitlist
-INFO: Wait list of Montreal Book before :
-
-Feb 15, 2019 9:03:26 PM com.rmi.libraries.Montreal addUserToWaitlist
-INFO: Adding CONU2233 to waitlist of itemIDMON2222
-Feb 15, 2019 9:03:26 PM com.rmi.libraries.Montreal addUserToWaitlist
-INFO: Request completed successfully.
-
-Feb 15, 2019 9:03:26 PM com.rmi.libraries.Montreal addUserToWaitlist
-INFO: CONU2233 added to MON2222 waitlist Successfully !!
-Feb 15, 2019 9:03:26 PM com.rmi.libraries.Montreal addUserToWaitlist
-INFO: Wait list of Montreal Book  After :
-
-Feb 15, 2019 9:03:26 PM com.rmi.libraries.Montreal lambda$5
-INFO: **  MON2222 {CONU2233=12}
-
-Feb 15, 2019 9:03:45 PM com.rmi.libraries.Montreal receive
-INFO: Request received at Montreal Server
-Feb 15, 2019 9:03:45 PM com.rmi.libraries.Montreal receive
-INFO: Request received is for BORROW
-Feb 15, 2019 9:03:45 PM com.rmi.libraries.Montreal borrowBookToUser
-INFO: CONU3344User borrowed book details before borrowing MOntreal library book null
-Feb 15, 2019 9:03:48 PM com.rmi.libraries.Montreal receive
-INFO: Request received at Montreal Server
-Feb 15, 2019 9:03:48 PM com.rmi.libraries.Montreal receive
-INFO: Request received is for WAIT
-Feb 15, 2019 9:03:48 PM com.rmi.libraries.Montreal addUserToWaitlist
-INFO: *****Adding User to WaitList*******
-
-Feb 15, 2019 9:03:48 PM com.rmi.libraries.Montreal addUserToWaitlist
-INFO: Wait list of Montreal Book before :
-
-Feb 15, 2019 9:03:48 PM com.rmi.libraries.Montreal lambda$4
-INFO: **  MON2222 {CONU2233=12}
-
-Feb 15, 2019 9:03:48 PM com.rmi.libraries.Montreal addUserToWaitlist
-INFO: Adding CONU3344 to waitlist of itemIDMON2222
-Feb 15, 2019 9:03:48 PM com.rmi.libraries.Montreal addUserToWaitlist
-INFO: Request completed successfully.
-
-Feb 15, 2019 9:03:48 PM com.rmi.libraries.Montreal addUserToWaitlist
-INFO: CONU3344 added to MON2222 waitlist Successfully !!
-Feb 15, 2019 9:03:48 PM com.rmi.libraries.Montreal addUserToWaitlist
-INFO: Wait list of Montreal Book  After :
-
-Feb 15, 2019 9:03:48 PM com.rmi.libraries.Montreal lambda$5
-INFO: **  MON2222 {CONU2233=12, CONU3344=34}
-
-Feb 15, 2019 9:04:04 PM com.rmi.common.action.ActionServiceImpl listItemAvailability
-INFO: 
-*****Entering Montreal Server*****
-Feb 15, 2019 9:04:04 PM com.rmi.common.action.ActionServiceImpl listItemAvailability
-INFO: Request Type: List items , Request params: managerID MONM2233
-Feb 15, 2019 9:04:04 PM com.rmi.common.action.ActionServiceImpl listItemAvailability
-INFO: Response returned: {MON1111=Computer Networks,9, MON2222=Computer Organization,0, MON3333=Discrete Mathmatical Structure,1, MON4444=Data Structure,8}
-Feb 15, 2019 9:04:23 PM com.rmi.common.action.ActionServiceImpl addItem
-INFO: 
-*****Entering Concordia Server*****
-
-Feb 15, 2019 9:04:23 PM com.rmi.common.action.ActionServiceImpl addItem
-INFO: Request Type: Add an item , Request params:
- managerID MONM2233, itemID MON2222, itemName Computer Organization, quantity 2
-Feb 15, 2019 9:04:23 PM com.rmi.common.action.ActionServiceImpl addItem
-INFO: MON2222 added successfully to libraray
-
-Feb 15, 2019 9:04:23 PM com.rmi.common.action.ActionServiceImpl addItem
-INFO: checking for any available in MON2222waitlist.
-
-Feb 15, 2019 9:04:23 PM com.rmi.libraries.Montreal receive
-INFO: Request received at Montreal Server
-Feb 15, 2019 9:04:23 PM com.rmi.libraries.Montreal receive
-INFO: Request received is for BORROW
-Feb 15, 2019 9:04:23 PM com.rmi.libraries.Montreal borrowBookToUser
-INFO: CONU2233User borrowed book details before borrowing MOntreal library book null
-Feb 15, 2019 9:04:23 PM com.rmi.libraries.Montreal borrowBookToUser
-INFO: Books in Montreal Library before user request {MON1111=Computer Networks,9, MON2222=Computer Organization,2, MON3333=Discrete Mathmatical Structure,1, MON4444=Data Structure,8}
-Feb 15, 2019 9:04:23 PM com.rmi.libraries.Montreal borrowBookToUser
-INFO: Request completed successfully.
-
-Feb 15, 2019 9:04:23 PM com.rmi.libraries.Montreal borrowBookToUser
-INFO: Books in Montreal Library after user request {MON1111=Computer Networks,9, MON2222=Computer Organization,1, MON3333=Discrete Mathmatical Structure,1, MON4444=Data Structure,8}.
-
-Feb 15, 2019 9:04:23 PM com.rmi.common.action.ActionServiceImpl addItem
-INFO: Book with book id MON2222 Successfully borrowed by user CONU2233.
-Feb 15, 2019 9:04:23 PM com.rmi.libraries.Montreal receive
-INFO: Request received at Montreal Server
-Feb 15, 2019 9:04:23 PM com.rmi.libraries.Montreal receive
-INFO: Request received is for BORROW
-Feb 15, 2019 9:04:23 PM com.rmi.libraries.Montreal borrowBookToUser
-INFO: CONU3344User borrowed book details before borrowing MOntreal library book null
-Feb 15, 2019 9:04:23 PM com.rmi.libraries.Montreal borrowBookToUser
-INFO: Books in Montreal Library before user request {MON1111=Computer Networks,9, MON2222=Computer Organization,1, MON3333=Discrete Mathmatical Structure,1, MON4444=Data Structure,8}
-Feb 15, 2019 9:04:23 PM com.rmi.libraries.Montreal borrowBookToUser
-INFO: Request completed successfully.
-
-Feb 15, 2019 9:04:23 PM com.rmi.libraries.Montreal borrowBookToUser
-INFO: Books in Montreal Library after user request {MON1111=Computer Networks,9, MON2222=Computer Organization,0, MON3333=Discrete Mathmatical Structure,1, MON4444=Data Structure,8}.
-
-Feb 15, 2019 9:04:23 PM com.rmi.common.action.ActionServiceImpl addItem
-INFO: Book with book id MON2222 Successfully borrowed by user CONU3344.
-Feb 15, 2019 9:04:23 PM com.rmi.common.action.ActionServiceImpl addItem
-INFO:  Users removed from the waitlist
- 
-Feb 15, 2019 9:04:23 PM com.rmi.common.action.ActionServiceImpl addItem
-INFO: Request successfully completed,
-
-Feb 15, 2019 9:04:23 PM com.rmi.common.action.ActionServiceImpl addItem
-INFO: Response returned: Item MON2222 exists, hence increased item's quantity by 2 Successfully, and assigned to users existed in Waitlist.
-
-Feb 15, 2019 9:04:27 PM com.rmi.common.action.ActionServiceImpl listItemAvailability
-INFO: 
-*****Entering Montreal Server*****
-Feb 15, 2019 9:04:27 PM com.rmi.common.action.ActionServiceImpl listItemAvailability
-INFO: Request Type: List items , Request params: managerID MONM2233
-Feb 15, 2019 9:04:27 PM com.rmi.common.action.ActionServiceImpl listItemAvailability
-INFO: Response returned: {MON1111=Computer Networks,9, MON2222=Computer Organization,0, MON3333=Discrete Mathmatical Structure,1, MON4444=Data Structure,8}
+Feb 16, 2019 1:03:14 AM com.rmi.libraries.Montreal setLibraryDetails
+INFO: NO Records

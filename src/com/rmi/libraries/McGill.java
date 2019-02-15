@@ -58,7 +58,7 @@ public class McGill {
 			try {
 				// This block configure the logger with handler and formatter
 				fileHandler = new FileHandler(
-						"C:\\Users\\mchaturv\\git\\DLMS_RMI_v2\\DLMS_RMI\\Logs\\Server\\McGill.log");
+						"Logs/Server/McGill.log");
 				logger.addHandler(fileHandler);
 
 				SimpleFormatter formatter = new SimpleFormatter();
@@ -228,7 +228,7 @@ public class McGill {
 		userlist.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
 
 		logger.info("Books WaitList registered while initialization\n");
-		if (waitlistBook != null)
+		if (!waitlistBook.isEmpty())
 			waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
 		else
 			logger.info("NO Records");
@@ -237,7 +237,7 @@ public class McGill {
 
 	public static boolean isUserAllowedInterLibraryBorrow(String library, String userID) {
 
-		String key;
+		String key="";
 		HashMap<String, Integer> userinfo;
 		logger.info("Checking User Info for accessibilty for requested book\n");
 		boolean isUserAllowed = true;
@@ -249,13 +249,14 @@ public class McGill {
 				key = thisEntry.getKey();
 				if (key.substring(0, 3).equalsIgnoreCase(library)) {
 					isUserAllowed = false;
+					break;
 				}
 			}
 		} else {
 			isUserAllowed = true;
 		}
 		if (isUserAllowed)
-			message = "Successfully";
+			message = "Successfully,"+key;
 		return isUserAllowed;
 	}
 
@@ -267,11 +268,11 @@ public class McGill {
 			temp.put(itemID, numberOfDays);
 			userlist.put(userID, temp);
 			logger.info("Book with book id " + itemID + " Successfully borrowed by user " + userID
-					+ ". Added the book to user's borrowed list\n");
+					+ ". Added the book to user's borrowed list.");
 			return "Book with book id " + itemID + " Successfully borrowed by user " + userID + ".";
 		} else {
 			logger.info("Item already available in user's burrowed list");
-			return "Requested book already exists in user's borrowed list. Cannot borrow the same book again";
+			return "Requested book already exists in user's borrowed list. Cannot borrow the same book again.";
 		}
 
 	}
@@ -287,7 +288,7 @@ public class McGill {
 			return "Item returned Successfully to the Library and removed from user borrowed list.";
 		} else {
 			logger.info(" Item with Item ID : " + itemID + " does not exist in User's borrowed List of books\n");
-			return "BookNotPresent : Item with Item ID : " + itemID
+			return "Book Not Present : Item with Item ID : " + itemID
 					+ " does not exist in User's borrowed List of books.";
 		}
 
@@ -300,12 +301,13 @@ public class McGill {
 		switch (lib) {
 		case "MCG":
 			if (Books.containsKey(itemID)) {
-				logger.info(userID + "User borrowed book details before borrowing McGill library book "
-						+ userlist.get(userID));
+				
 				int quantity = Integer.parseInt(Books.get(itemID).split(",")[1]);
 				if (quantity > 0) {
 					logger.info("Books in MCGill Library before user request " + Books);
 					if (userID.contains("MCG")) {
+						logger.info(userID + " borrowed book details before borrowing "+itemID+ ":"
+								+ userlist.get(userID)+".\n");
 						message = setUserDetails(userID, itemID, numberOfDays);
 						logger.info(userID + " borrowed book details after borrowing "+itemID+ ":"
 								+ userlist.get(userID)+".\n");
@@ -343,13 +345,13 @@ public class McGill {
 						message = "User " + userID + " already present in " + itemID + " waitlist.";
 						logger.info("Request failed: " + message);
 					} else {
-						message = "Unavailable : Book requested is currently not available";
+						message = "Unavailable : Book requested is currently not available.";
 					}
 				}
 
 			} else {
-				message = "InvalidBook: Book ID is Invalid. PLease Provide a Valid Item Id ";
-				logger.info("Request failed : Book ID Provded is invalid");
+				message = "Book ID is Invalid. No Book exist in library with provide Name.";
+				logger.info("Request failed : Book ID Provded is invalid.");
 			}
 			break;
 
@@ -376,12 +378,12 @@ public class McGill {
 				sendMessage(2222);
 				message = dataReceived;
 				if (message.contains("removed")) {
-					message = "User removed from waitlist";
+					message = "User removed from waitlist.";
 					logger.info(
 							"Request failed: User was not allowed to borrow requested book and is removed from waitlist\n");
 				}
 				} else {
-					message = userID + " has already borrowed one Montreal Library book. Maximum borrow limit is one.";
+					message = userID + " has already borrowed one Montreal Library book(Book ID -"+message+"). Maximum borrow limit is one.";
 				}
 			}
 			break;
@@ -409,12 +411,12 @@ public class McGill {
 				sendMessage(1111);
 				message = dataReceived;
 				if (message.contains("removed")) {
-					message = "User removed from waitlist";
+					message = "User removed from waitlist.";
 					logger.info(
 							"Request failed: User was not allowed to borrow requested book and is removed from waitlist\n");
 				}
 				} else {
-					message = userID + " has already borrowed one Concordia Library book. Maximum borrow limit is one.";
+					message = userID + " has already borrowed one COncordia Library book(Book ID -"+message+"). Maximum borrow limit is one.";
 				}
 			}
 			break;
@@ -427,6 +429,7 @@ public class McGill {
 	public static String addUserToWaitlist(String userID, String itemID, int numberOfDays) {
 		LinkedHashMap<String, Integer> waitUList = new LinkedHashMap<String, Integer>();
 		String library = itemID.substring(0, 3).toUpperCase();
+		int position;
 		switch (library) {
 		case "MCG":
 			logger.info("*****Adding User to WaitList*******\n");
@@ -436,14 +439,16 @@ public class McGill {
 				logger.info("Adding " + userID + " to waitlist of itemID" + itemID);
 				waitUList = waitlistBook.get(itemID);
 				waitUList.put(userID, numberOfDays);
+				position=waitUList.size();
 				waitlistBook.put(itemID, waitUList);
 			} else {
 				logger.info("Adding " + userID + " to waitlist of itemID" + itemID);
 				waitUList.put(userID, numberOfDays);
+				position=waitUList.size();
 				waitlistBook.put(itemID, waitUList);
 			}
 
-			message = userID + " added to " + itemID + " waitlist Successfully !!";
+			message = userID + " added to " + itemID + " waitlist Successfully !!. You are at position - "+position+" in the Queue.";
 			logger.info("Request completed successfully.\n");
 			logger.info(message);
 			logger.info("Wait list of McGill Book  After :\n");
@@ -475,7 +480,8 @@ public class McGill {
 				int quantity = Integer.parseInt(Books.get(itemID).split(",")[1]);
 				logger.info("Books in McGill Library before user request:\n" + Books + "\n");
 				if (userID.contains("MCG")) {
-
+					logger.info(userID + " borrowed book details before returning " + itemID + ":\n"
+							+ userlist.get(userID) + ".\n");
 					message = updateUserBookDetails(userID, itemID);
 					logger.info(userID + " borrowed book details after returning " + itemID + ":\n"
 							+ userlist.get(userID) + ".\n");
@@ -505,7 +511,7 @@ public class McGill {
 				logger.info("Books in McGill Library after user request :\n" + Books + "\n");
 
 			} else {
-				message = "InvalidBook : Book Id is Invalid.";
+				message = "Book ID is Invalid. No Book exist in library with provide Name.";
 				logger.info("Request failed.Invalid Book Id provided\n");
 			}
 			break;
@@ -607,11 +613,11 @@ public class McGill {
 			}
 
 			else if (oldquantity < quantity) {
-				operation = "Invalid Quantity , Quantity provided is more than available quantity";
+				operation = "Invalid Quantity , Quantity provided is more than available quantity.";
 				logger.info("Request Failed :  Quantity provided is more than available quantity ");
 			}
 		} else {
-			operation = "Invalid Book : Book is not available in Library";
+			operation = "Invalid Book : Book is not available in Library.";
 			logger.info("Request Failed :  Book Id provided is not available in Library ");
 		}
 		return operation;
@@ -648,7 +654,7 @@ public class McGill {
 			if (waitUserList.containsKey(userID)) {
 				waitUserList.remove(userID);
 				waitlistBook.put(itemID, waitUserList);
-				message = "User removed from waitlist";
+				message = "User removed from waitlist.";
 				logger.info(userID + " removed from waitlist of " + itemID + ".\n");
 			}
 			if (waitUserList.isEmpty()) {

@@ -56,7 +56,7 @@ public class Montreal {
 			try {
 				// This block configure the logger with handler and formatter
 				fileHandler = new FileHandler(
-						"C:\\Users\\mchaturv\\git\\DLMS_RMI_v2\\DLMS_RMI\\Logs\\Server\\Montreal.log");
+						"Logs/Server/Montreal.log");
 				logger.addHandler(fileHandler);
 
 				SimpleFormatter formatter = new SimpleFormatter();
@@ -219,16 +219,16 @@ public class Montreal {
 		userlist.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
 
 		logger.info("Books WaitList registered while initialization\n");
-		if (waitlistBook != null)
+		if (!waitlistBook.isEmpty())
 			waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
 		else
-			System.out.println("NO Records");
+			logger.info("NO Records");
 
 	}
 
 	public static boolean isUserAllowedInterLibraryBorrow(String library, String userID) {
 
-		String key;
+		String key="";
 		HashMap<String, Integer> userinfo;
 		logger.info("Checking User Info for accessibilty for requested book\n");
 		boolean isUserAllowed = true;
@@ -240,6 +240,7 @@ public class Montreal {
 				key = thisEntry.getKey();
 				if (key.substring(0, 3).equalsIgnoreCase(library)) {
 					isUserAllowed = false;
+					break;
 				}
 			}
 		} else {
@@ -247,6 +248,8 @@ public class Montreal {
 		}
 		if (isUserAllowed)
 			message = "Successfully";
+		else
+			message = key;
 		return isUserAllowed;
 	}
 
@@ -262,7 +265,7 @@ public class Montreal {
 			return "Book with book id " + itemID + " Successfully borrowed by user " + userID + ".";
 		} else {
 			logger.info("Item already available in user's burrowed list");
-			return "Requested book already exists in user's borrowed list. Cannot borrow the same book again";
+			return "Requested book already exists in user's borrowed list. Cannot borrow the same book again.";
 		}
 
 	}
@@ -274,11 +277,11 @@ public class Montreal {
 		if (temp.containsKey(itemID)) {
 			temp.remove(itemID);
 			userlist.put(userID, temp);
-			logger.info(" Item returned Successfully to the Library and removed from user borrowed list.\n");
+			logger.info(" Item returned Successfully to the Library and removed from user borrowed list.");
 			return "Item returned Successfully to the Library and removed from user borrowed list.";
 		} else {
-			logger.info(" Item with Item ID : " + itemID + " does not exist in User's borrowed List of books\n");
-			return "BookNotPresent : Item with Item ID : " + itemID
+			logger.info(" Item with Item ID : " + itemID + " does not exist in User's borrowed List of books.");
+			return "Book Not Present : Item with Item ID : " + itemID
 					+ " does not exist in User's borrowed List of books.";
 		}
 
@@ -291,13 +294,13 @@ public class Montreal {
 		switch (lib) {
 		case "MON":
 
-			if (Books.containsKey(itemID)) {
-				logger.info(userID + "User borrowed book details before borrowing MOntreal library book "
-						+ userlist.get(userID));
+			if (Books.containsKey(itemID)) {	
 				int quantity = Integer.parseInt(Books.get(itemID).split(",")[1]);
 				if (quantity > 0) {
-					logger.info("Books in Montreal Library before user request " + Books);
+					logger.info("Books in Montreal Library before user request " + Books.toString()+"\n");
 					if (userID.contains("MON")) {
+						logger.info(userID + " borrowed book details before borrowing "+itemID+ ":"
+								+ userlist.get(userID)+".\n");
 						message = setUserDetails(userID, itemID, numberOfDays);
 						logger.info(userID + " borrowed book details after borrowing "+itemID+ ":"
 								+ userlist.get(userID)+".\n");
@@ -336,13 +339,13 @@ public class Montreal {
 						message = "User " + userID + " already present in " + itemID + " waitlist.";
 						logger.info("Request failed: " + message);
 					} else {
-						message = "Unavailable : Book requested is currently not available";
+						message = "Unavailable : Book requested is currently not available.";
 					}
 				}
 
 			} else {
-				message = "InvalidBook: Book ID is Invalid. PLease Provide a Valid Item Id ";
-				logger.info("Request failed : Book ID Provded is invalid");
+				message = "Book ID is Invalid. No Book exist in library with provide Name.";
+				logger.info("Request failed : Book ID Provded is invalid.");
 			}
 			break;
 
@@ -374,7 +377,8 @@ public class Montreal {
 							"Request failed: User was not allowed to borrow requested book and is removed from waitlist\n");
 				}
 				} else {
-					message = userID + " has already borrowed one Concordia Library book. Maximum borrow limit is one.";
+					
+					message = userID + " has already borrowed one Concordia Library book(Book ID -"+message+"). Maximum borrow limit is one.";
 				}
 			}
 			break;
@@ -406,7 +410,7 @@ public class Montreal {
 							"Request failed: User was not allowed to borrow requested book and is removed from waitlist\n");
 				}
 				} else {
-					message = userID + " has already borrowed one McGill Library book. Maximum borrow limit is one.";
+					message = userID + " has already borrowed one McGill Library book(Book ID -"+message+"). Maximum borrow limit is one.";
 				}
 			}
 			break;
@@ -420,6 +424,7 @@ public class Montreal {
 
 		String library = itemID.substring(0, 3).toUpperCase();
 		LinkedHashMap<String, Integer> waitUList = new LinkedHashMap<String, Integer>();
+		int position;
 		switch (library) {
 		case "MON":
 			logger.info("*****Adding User to WaitList*******\n");
@@ -429,14 +434,16 @@ public class Montreal {
 				logger.info("Adding " + userID + " to waitlist of itemID" + itemID);
 				waitUList = waitlistBook.get(itemID);
 				waitUList.put(userID, numberOfDays);
+				position=waitUList.size();
 				waitlistBook.put(itemID, waitUList);
 			} else {
 				logger.info("Adding " + userID + " to waitlist of itemID" + itemID);
 				waitUList.put(userID, numberOfDays);
+				position=waitUList.size();
 				waitlistBook.put(itemID, waitUList);
 			}
 
-			message = userID + " added to " + itemID + " waitlist Successfully !!";
+			message = userID + " added to " + itemID + " waitlist Successfully !!. You are at position - "+position+" in the Queue.";
 			logger.info("Request completed successfully.\n");
 			logger.info(message);
 			logger.info("Wait list of Montreal Book  After :\n");
@@ -499,7 +506,7 @@ public class Montreal {
 				logger.info("Books in Montreal Library after user request :\n" + Books + "\n");
 
 			} else {
-				message = "InvalidBook : Book Id is Invalid.";
+				message = "Book ID is Invalid. No Book exist in library with provide Name.";
 				logger.info("Request failed.Invalid Book Id provided\n");
 			}
 			break;
@@ -596,16 +603,17 @@ public class Montreal {
 					sendMessage(3333);
 
 					operation = "Book removed Successfully and Borrowed List of User's.";
+					logger.info("After removal, waitlist is cleared. Available Waitlist:\n" + waitlistBook + "\n");
 				}
 
 			}
 
 			else if (oldquantity < quantity) {
-				operation = "Invalid Quantity , Quantity provided is more than available quantity";
+				operation = "Invalid Quantity , Quantity provided is more than available quantity.";
 				logger.info("Request Failed :  Quantity provided is more than available quantity ");
 			}
 		} else {
-			operation = "Invalid Book : Book is not available in Library";
+			operation = "Invalid Book : Book is not available in Library.";
 			logger.info("Request Failed :  Book Id provided is not available in Library ");
 		}
 		return operation;
@@ -642,7 +650,7 @@ public class Montreal {
 			if (waitUserList.containsKey(userID)) {
 				waitUserList.remove(userID);
 				waitlistBook.put(itemID, waitUserList);
-				message = "User removed from waitlist";
+				message = "User removed from waitlist.";
 				logger.info(userID + " removed from waitlist of " + itemID + ".\n");
 			}
 			if (waitUserList.isEmpty()) {

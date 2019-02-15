@@ -54,7 +54,7 @@ public class Concordia {
 			try {
 				// This block configure the logger with handler and formatter
 				fileHandler = new FileHandler(
-						"C:\\Users\\mchaturv\\git\\DLMS_RMI_v2\\DLMS_RMI\\Logs\\Server\\Concordia.log");
+						"Logs/Server/Concordia.log");
 				logger.addHandler(fileHandler);
 				SimpleFormatter formatter = new SimpleFormatter();
 				fileHandler.setFormatter(formatter);
@@ -216,15 +216,18 @@ public class Concordia {
 		waitUserList1.put("MONU1122", 17);
 		waitUserList1.put("CONU2233", 19);
 		waitlistBook.put("CON2222", waitUserList1);
-
-		logger.info(" ** Books WaitList registered while initialization\n");
-		waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
+		
+		logger.info("Books WaitList registered while initialization\n");
+		if (!waitlistBook.isEmpty())
+			waitlistBook.forEach((k, v) -> logger.info(("**  " + k + " " + v + "\n")));
+		else
+			logger.info("NO Records");
 
 	}
 
 	public static boolean isUserAllowedInterLibraryBorrow(String library, String userID) {
 
-		String key;
+		String key="";
 		HashMap<String, Integer> userinfo;
 		logger.info("Checking User Info for accessibilty for requested book\n");
 		boolean isUserAllowed = true;
@@ -236,13 +239,14 @@ public class Concordia {
 				key = thisEntry.getKey();
 				if (key.substring(0, 3).equalsIgnoreCase(library)) {
 					isUserAllowed = false;
+					break;
 				}
 			}
 		} else {
 			isUserAllowed = true;
 		}
 		if (isUserAllowed)
-			message = "Successfully";
+			message = "Successfully,"+key;
 		return isUserAllowed;
 	}
 
@@ -254,11 +258,11 @@ public class Concordia {
 			temp.put(itemID, numberOfDays);
 			userlist.put(userID, temp);
 			logger.info("Book with book id " + itemID + " Successfully borrowed by user " + userID
-					+ ". Added the book to user's borrowed list\n");
+					+ ". Added the book to user's borrowed list.");
 			return "Book with book id " + itemID + " Successfully borrowed by user " + userID + ".";
 		} else {
 			logger.info("Item already available in user's burrowed list");
-			return "Requested book already exists in user's borrowed list. Cannot borrow the same book again";
+			return "Requested book already exists in user's borrowed list. Cannot borrow the same book again.";
 		}
 
 	}
@@ -292,6 +296,8 @@ public class Concordia {
 				if (quantity > 0) {
 					logger.info("Books in Concordia Library before user request " + Books + ".\n");
 					if (userID.contains("CON")) {
+						logger.info(userID + " borrowed book details before borrowing " + itemID + ":"
+							+ userlist.get(userID) + ".\n");
 						message = setUserDetails(userID, itemID, numberOfDays);
 						logger.info(userID + " borrowed book details after borrowing " + itemID + ":"
 								+ userlist.get(userID) + ".\n");
@@ -329,12 +335,12 @@ public class Concordia {
 						message = "User " + userID + " already present in " + itemID + " waitlist.";
 						logger.info("Request failed: " + message);
 					} else {
-						message = "Unavailable : Book requested is currently not available";
+						message = "Unavailable : Book requested is currently not available.";
 					}
 				}
 
 			} else {
-				message = "InvalidBook: Book ID is Invalid. PLease Provide a Valid Item Id ";
+				message = "Book ID is Invalid. No Book exist in library with provide Name.";
 				logger.info("Request failed : Book ID Provded is invalid");
 			}
 			break;
@@ -367,7 +373,7 @@ public class Concordia {
 								"Request failed: User was not allowed to borrow requested book and is removed from waitlist\n");
 					}
 				} else {
-					message = userID + " has already borrowed one Montreal Library book. Maximum borrow limit is one.";
+					message = userID + " has already borrowed one Montreal Library book(Book ID -"+message+"). Maximum borrow limit is one.";
 				}
 			}
 			break;
@@ -399,7 +405,7 @@ public class Concordia {
 								"Request failed: User was not allowed to borrow requested book and is removed from waitlist\n");
 					}
 				} else {
-					message = userID + " has already borrowed one McGill Library book. Maximum borrow limit is one.";
+					message = userID + " has already borrowed one McGill Library book(Book ID -"+message+"). Maximum borrow limit is one.";
 				}
 			}
 			break;
@@ -413,6 +419,7 @@ public class Concordia {
 
 		String library = itemID.substring(0, 3).toUpperCase();
 		LinkedHashMap<String, Integer> waitUList = new LinkedHashMap<String, Integer>();
+		int position;
 		switch (library) {
 		case "CON":
 			logger.info("*****Adding User to WaitList*******\n");
@@ -422,14 +429,16 @@ public class Concordia {
 				logger.info("Adding " + userID + " to waitlist of itemID" + itemID);
 				waitUList = waitlistBook.get(itemID);
 				waitUList.put(userID, numberOfDays);
+				position=waitUList.size();
 				waitlistBook.put(itemID, waitUList);
 			} else {
 				logger.info("Adding " + userID + " to waitlist of itemID" + itemID);
 				waitUList.put(userID, numberOfDays);
+				position=waitUList.size();
 				waitlistBook.put(itemID, waitUList);
 			}
 
-			message = userID + " added to " + itemID + " waitlist Successfully !!";
+			message = userID + " added to " + itemID + " waitlist Successfully !!. You are at position - "+position+" in the Queue.";
 			logger.info("Request completed successfully.\n");
 			logger.info(message);
 			logger.info("Wait list of Concordia Book  After user request:\n");
@@ -461,7 +470,8 @@ public class Concordia {
 				int quantity = Integer.parseInt(Books.get(itemID).split(",")[1]);
 				logger.info("Books in Concordia Library before user request:\n" + Books + "\n");
 				if (userID.contains("CON")) {
-
+					logger.info(userID + " borrowed book details before returning " + itemID + ":\n"
+							+ userlist.get(userID) + ".\n");
 					message = updateUserBookDetails(userID, itemID);
 					logger.info(userID + " borrowed book details after returning " + itemID + ":\n"
 							+ userlist.get(userID) + ".\n");
@@ -491,7 +501,7 @@ public class Concordia {
 				logger.info("Books in Concordia Library after user request :\n" + Books + "\n");
 
 			} else {
-				message = "InvalidBook : Book Id is Invalid.";
+				message = "Book ID is Invalid. No Book exist in library with provide Name.";
 				logger.info("Request failed.Invalid Book Id provided\n");
 			}
 			break;
@@ -593,11 +603,11 @@ public class Concordia {
 			}
 
 			else if (oldquantity < quantity) {
-				operation = "Invalid Quantity , Quantity provided is more than available quantity";
+				operation = "Invalid Quantity , Quantity provided is more than available quantity.";
 				logger.info("Request Failed :  Quantity provided is more than available quantity ");
 			}
 		} else {
-			operation = "Invalid Book : Book is not available in Library";
+			operation = "Invalid Book : Book is not available in Library.";
 			logger.info("Request Failed :  Book Id provided is not available in Library ");
 		}
 		return operation;
@@ -634,7 +644,7 @@ public class Concordia {
 			if (waitUserList.containsKey(userID)) {
 				waitUserList.remove(userID);
 				waitlistBook.put(itemID, waitUserList);
-				message = "User removed from waitlist";
+				message = "User removed from waitlist.";
 				logger.info(userID + " removed from waitlist of " + itemID + ".\n");
 			}
 			if (waitUserList.isEmpty()) {
