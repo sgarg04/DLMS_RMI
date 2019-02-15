@@ -14,7 +14,6 @@ import com.rmi.libraries.McGill;
 import com.rmi.libraries.Montreal;
 
 public class ActionServiceImpl extends UnicastRemoteObject implements ActionService {
-
 	/**
 	 * 
 	 */

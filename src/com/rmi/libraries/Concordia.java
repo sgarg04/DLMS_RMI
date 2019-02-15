@@ -27,7 +27,6 @@ public class Concordia {
 	public static ArrayList<String> managerUserList = new ArrayList<String>();
 	public static LinkedHashMap<String, Integer> waitUserList = new LinkedHashMap<String, Integer>();
 	public static HashMap<String, LinkedHashMap<String, Integer>> waitlistBook = new HashMap<String, LinkedHashMap<String, Integer>>();
-
 	private static String sendRequestMessage;
 	private static String sendRequestReceived;
 	private static String dataReceived;

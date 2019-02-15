@@ -44,6 +44,7 @@ Feb 16, 2019 4:12:54 AM com.rmi.libraries.Montreal receive
 INFO: Request received at Montreal Server
 Feb 16, 2019 4:12:54 AM com.rmi.libraries.Montreal receive
 INFO: Request received is for WAIT
+
 Feb 16, 2019 4:12:54 AM com.rmi.libraries.Montreal addUserToWaitlist
 INFO: *****Adding User to WaitList*******
 

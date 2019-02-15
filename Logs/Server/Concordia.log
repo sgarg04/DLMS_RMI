@@ -78,6 +78,7 @@ Feb 16, 2019 4:12:54 AM com.rmi.common.action.ActionServiceImpl waitList
 INFO: Response returned: CONU2233 added to MON2222 waitlist Successfully !!. You are at position  1 in the Queue.
 Feb 16, 2019 4:13:01 AM com.rmi.common.action.ActionServiceImpl borrowItem
 INFO: 
+
 *****Entering Concordia Server*****
 Feb 16, 2019 4:13:01 AM com.rmi.common.action.ActionServiceImpl borrowItem
 INFO: Request Type: Borrow an item , Request params: userID CONU2233, itemID MON3333, numberOfDays 12
