@@ -256,7 +256,9 @@ public class McGill {
 			isUserAllowed = true;
 		}
 		if (isUserAllowed)
-			message = "Successfully,"+key;
+			message = "Successfully";
+		else
+			message = key;
 		return isUserAllowed;
 	}
 
