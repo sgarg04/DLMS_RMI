@@ -41,30 +41,16 @@ public class Montreal {
 	}
 
 	public static void startMontrealServer() throws Exception {
-
+		logger = Logger.getLogger(Montreal.class.getName());
 		Runnable task = () -> {
 			receive();
 		};
 		Thread thread = new Thread(task);
 		thread.start();
 		ActionService monStub = new ActionServiceImpl();
-		logger = Logger.getLogger(Montreal.class.getName());
-		logger.setUseParentHandlers(false);
+
 		logger.info("Montreal server started");
 		try {
-			try {
-				// This block configure the logger with handler and formatter
-				fileHandler = new FileHandler(
-						"Logs/Server/Montreal.log");
-				logger.addHandler(fileHandler);
-
-				SimpleFormatter formatter = new SimpleFormatter();
-				fileHandler.setFormatter(formatter);
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 			// special exception handler for registry creation
 			LocateRegistry.createRegistry(5555);
 			System.out.println("Montreal registry created." + "\n");
@@ -102,6 +88,20 @@ public class Montreal {
 			byte[] buffer = new byte[1000];
 			DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
 			aSocket.receive(reply);
+			logger = Logger.getLogger(Montreal.class.getName());
+			logger.setUseParentHandlers(false);
+			try {
+				// This block configure the logger with handler and formatter
+				fileHandler = new FileHandler("Logs/Server/Montreal.log");
+				logger.addHandler(fileHandler);
+
+				SimpleFormatter formatter = new SimpleFormatter();
+				fileHandler.setFormatter(formatter);
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			dataReceived = null;
 			dataReceived = new String(reply.getData()).trim();
 			logger.info("Reply received from the server with port number " + serverPort + " to Montreal server is: "
@@ -122,6 +122,21 @@ public class Montreal {
 
 	private static void receive() {
 		DatagramSocket aSocket = null;
+
+		logger = Logger.getLogger(Montreal.class.getName());
+		logger.setUseParentHandlers(false);
+		try {
+			// This block configure the logger with handler and formatter
+			fileHandler = new FileHandler("Logs/Server/Montreal.log");
+			logger.addHandler(fileHandler);
+
+			SimpleFormatter formatter = new SimpleFormatter();
+			fileHandler.setFormatter(formatter);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		try {
 			String func = null;
 			String repMessage = "";
@@ -227,7 +242,7 @@ public class Montreal {
 
 	public static boolean isUserAllowedInterLibraryBorrow(String library, String userID) {
 
-		String key="";
+		String key = "";
 		HashMap<String, Integer> userinfo;
 		logger.info("Checking User Info for accessibilty for requested book\n");
 		boolean isUserAllowed = true;
@@ -293,16 +308,16 @@ public class Montreal {
 		switch (lib) {
 		case "MON":
 
-			if (Books.containsKey(itemID)) {	
+			if (Books.containsKey(itemID)) {
 				int quantity = Integer.parseInt(Books.get(itemID).split(",")[1]);
 				if (quantity > 0) {
-					logger.info("Books in Montreal Library before user request " + Books.toString()+"\n");
+					logger.info("Books in Montreal Library before user request " + Books.toString() + "\n");
 					if (userID.contains("MON")) {
-						logger.info(userID + " borrowed book details before borrowing "+itemID+ ":"
-								+ userlist.get(userID)+".\n");
+						logger.info(userID + " borrowed book details before borrowing " + itemID + ":"
+								+ userlist.get(userID) + ".\n");
 						message = setUserDetails(userID, itemID, numberOfDays);
-						logger.info(userID + " borrowed book details after borrowing "+itemID+ ":"
-								+ userlist.get(userID)+".\n");
+						logger.info(userID + " borrowed book details after borrowing " + itemID + ":"
+								+ userlist.get(userID) + ".\n");
 
 					}
 					if (message.contains("Successfully")) {
@@ -366,18 +381,20 @@ public class Montreal {
 
 			} else {
 				logger.info("Request failed: User is not allowed to borrow requested book. Already Borrowed one book.");
-				if (Thread.currentThread().getStackTrace()[3].getMethodName().equalsIgnoreCase("returnItem") || Thread.currentThread().getStackTrace()[3].getMethodName().equalsIgnoreCase("addItem")) {
-				sendRequestMessage = "CheckWaitlist" + "," + userID + "," + itemID;
-				sendMessage(1111);
-				message = dataReceived;
-				if (message.contains("removed")) {
-					message = "User removed from waitlist";
-					logger.info(
-							"Request failed: User was not allowed to borrow requested book and is removed from waitlist\n");
-				}
+				if (Thread.currentThread().getStackTrace()[3].getMethodName().equalsIgnoreCase("returnItem")
+						|| Thread.currentThread().getStackTrace()[3].getMethodName().equalsIgnoreCase("addItem")) {
+					sendRequestMessage = "CheckWaitlist" + "," + userID + "," + itemID;
+					sendMessage(1111);
+					message = dataReceived;
+					if (message.contains("removed")) {
+						message = "User removed from waitlist";
+						logger.info(
+								"Request failed: User was not allowed to borrow requested book and is removed from waitlist\n");
+					}
 				} else {
-					
-					message = userID + " has already borrowed one Concordia Library book(Book ID -"+message+"). Maximum borrow limit is one.";
+
+					message = userID + " has already borrowed one Concordia Library book(Book ID -" + message
+							+ "). Maximum borrow limit is one.";
 				}
 			}
 			break;
@@ -400,16 +417,18 @@ public class Montreal {
 
 			} else {
 				logger.info("Request failed: User is not allowed to borrow requested book. Already Borrowed one book.");
-				if (Thread.currentThread().getStackTrace()[3].getMethodName().equalsIgnoreCase("returnItem") || Thread.currentThread().getStackTrace()[3].getMethodName().equalsIgnoreCase("addItem")) {
-				sendRequestMessage = "CheckWaitlist" + "," + userID + "," + itemID;
-				sendMessage(3333);
-				message = dataReceived;
-				if (message.contains("removed")) {
-					logger.info(
-							"Request failed: User was not allowed to borrow requested book and is removed from waitlist\n");
-				}
+				if (Thread.currentThread().getStackTrace()[3].getMethodName().equalsIgnoreCase("returnItem")
+						|| Thread.currentThread().getStackTrace()[3].getMethodName().equalsIgnoreCase("addItem")) {
+					sendRequestMessage = "CheckWaitlist" + "," + userID + "," + itemID;
+					sendMessage(3333);
+					message = dataReceived;
+					if (message.contains("removed")) {
+						logger.info(
+								"Request failed: User was not allowed to borrow requested book and is removed from waitlist\n");
+					}
 				} else {
-					message = userID + " has already borrowed one McGill Library book(Book ID -"+message+"). Maximum borrow limit is one.";
+					message = userID + " has already borrowed one McGill Library book(Book ID -" + message
+							+ "). Maximum borrow limit is one.";
 				}
 			}
 			break;
@@ -433,16 +452,17 @@ public class Montreal {
 				logger.info("Adding " + userID + " to waitlist of itemID" + itemID);
 				waitUList = waitlistBook.get(itemID);
 				waitUList.put(userID, numberOfDays);
-				position=waitUList.size();
+				position = waitUList.size();
 				waitlistBook.put(itemID, waitUList);
 			} else {
 				logger.info("Adding " + userID + " to waitlist of itemID" + itemID);
 				waitUList.put(userID, numberOfDays);
-				position=waitUList.size();
+				position = waitUList.size();
 				waitlistBook.put(itemID, waitUList);
 			}
 
-			message = userID + " added to " + itemID + " waitlist Successfully !!. You are at position  "+position+" in the Queue.";
+			message = userID + " added to " + itemID + " waitlist Successfully !!. You are at position  " + position
+					+ " in the Queue.";
 			logger.info("Request completed successfully.\n");
 			logger.info(message);
 			logger.info("Wait list of Montreal Book  After :\n");
@@ -587,8 +607,7 @@ public class Montreal {
 				if (quantity != -1) {
 					String keyValue = itemName + "," + newQuantity;
 					conBooks.put(itemID, keyValue);
-					operation = "Book's quantity decreased by " + quantity
-							+ " Successfully  from the available list! ";
+					operation = "Book's quantity decreased by " + quantity + " Successfully  from the available list! ";
 					logger.info("After removal:\n" + Books.toString() + "\n");
 					logger.info("Request completed successfully");
 				} else if (quantity == -1) {
